@@ -1,35 +1,69 @@
 import { MetadataRoute } from 'next';
 
-const BASE_URL = 'https://circuitsphere.pk'; // ⚠️ REPLACE WITH YOUR REAL DOMAIN
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // 1. Fetch all your products
-  // Note: Change localhost to your deployed API URL when launching
-  const response = await fetch('http://localhost:8000/api/v1/kits/'); 
-  const products = await response.json();
+  const baseUrl = "https://circuit-sphere.vercel.app"; // Update this to your actual domain later
 
-  // 2. Generate URLs for every product
-  const productUrls = products.map((product: any) => ({
-    url: `${BASE_URL}/shop/${product.id}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.8,
-  }));
+  try {
+    // Attempt to fetch product data for dynamic routes
+    // Using an environment variable is safer than hardcoding localhost
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+    
+    const response = await fetch(`${apiUrl}/products`, {
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
 
-  // 3. Add your static pages
-  return [
-    {
-      url: BASE_URL,
+    if (!response.ok) {
+      throw new Error("Backend unreachable");
+    }
+
+    const products = await response.json();
+
+    const productEntries: MetadataRoute.Sitemap = products.map((product: any) => ({
+      url: `${baseUrl}/shop/${product.id}`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${BASE_URL}/shop-with-sidebar`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    ...productUrls,
-  ];
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    }));
+
+    return [
+      {
+        url: baseUrl,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 1,
+      },
+      {
+        url: `${baseUrl}/shop`,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 0.8,
+      },
+      ...productEntries,
+    ];
+
+  } catch (error) {
+    // ✅ FALLBACK: This block runs if your backend hasn't been uploaded yet
+    console.warn("Sitemap generation: Backend not found, using static fallback routes.");
+    
+    return [
+      {
+        url: baseUrl,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 1,
+      },
+      {
+        url: `${baseUrl}/shop`,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 0.8,
+      },
+      {
+        url: `${baseUrl}/contact`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly',
+        priority: 0.5,
+      },
+    ];
+  }
 }
