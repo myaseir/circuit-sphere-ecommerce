@@ -1,21 +1,24 @@
 export type Product = {
-  id: string | number; // Updated to support MongoDB strings
+  id: string | number; 
   title: string;
   price: number;
   
-  // Make these optional since the API might not always return them initially
+  // Optional fields for safety
   reviews?: number;
   discountedPrice?: number;
   
-  // ✅ New fields for the API
-  image: string[]; // Standardized as an array for consistency
+  // ✅ API STANDARD: Array of images
+  image: string[]; 
+
+  // ✅ UI FALLBACK: To prevent existing components from crashing
+  // Use this in your components as: src={product.img || product.image[0]}
+  img?: string; 
+
   category?: string;
   stock?: number;
-  
-  // ✅ New field added here
   description?: string; 
 
-  // ⚠️ Old structure (kept for backward compatibility with other components)
+  // ⚠️ BACKWARD COMPATIBILITY
   imgs?: {
     thumbnails: string[];
     previews: string[];
@@ -24,8 +27,8 @@ export type Product = {
   // ----------------------------------------
   // ✅ NEW FIELDS FOR SALE & SPECIFICATIONS
   // ----------------------------------------
-  originalPrice?: number;                // The "crossed out" price (e.g. 2000)
-  isOnSale?: boolean;                    // Toggle for the "Sale" badge
-  specifications?: Record<string, string>; // e.g. {"Voltage": "5V", "MCU": "ESP32"}
-  specImages?: string[];                 // List of technical diagram URLs
+  originalPrice?: number;                
+  isOnSale?: boolean;                    
+  specifications?: Record<string, string>; 
+  specImages?: string[];                 
 };
