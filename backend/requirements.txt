@@ -8,3 +8,4 @@ pydantic-settings==2.1.0
 python-multipart==0.0.6
 structlog==23.2.0
 python-json-logger
+cloudinary==1.38.0
