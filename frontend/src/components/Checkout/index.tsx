@@ -96,11 +96,24 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       console.log("Submitting Order:", orderPayload);
 
-      const response = await fetch("http://localhost:8000/api/v1/orders/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderPayload),
-      });
+      // This dynamic URL works for both local development and production
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+const response = await fetch(`${baseUrl}/api/v1/orders/`, {
+  method: "POST",
+  headers: { 
+    "Content-Type": "application/json" 
+  },
+  body: JSON.stringify(orderPayload),
+});
+
+if (!response.ok) {
+  // Good to add some error handling here for your final project!
+  const errorData = await response.json();
+  throw new Error(errorData.message || "Failed to place order");
+}
+
+
 
       const data = await response.json();
 

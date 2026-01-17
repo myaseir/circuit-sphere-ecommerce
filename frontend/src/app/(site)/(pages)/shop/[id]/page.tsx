@@ -13,10 +13,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
 
   try {
-    const response = await fetch(`https://circuit-sphere-ecommerce.onrender.com/api/v1/kits/${id}`);
+   const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    
+    const response = await fetch(`${baseUrl}/api/v1/kits/${id}`);
     
     if (!response.ok) return { title: "Product Not Found | Circuit Sphere" };
-
     const product = await response.json();
     
     const socialImage = Array.isArray(product.image_url) ? product.image_url[0] : product.image_url;

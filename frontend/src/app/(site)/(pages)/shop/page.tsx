@@ -32,10 +32,12 @@ const ShopContent = () => {
   useEffect(() => {
     const fetchFilteredProducts = async () => {
       try {
-        setLoading(true);
-        const response = await fetch(`https://circuit-sphere-ecommerce.onrender.com/api/v1/kits`);
-        if (!response.ok) throw new Error("Failed to fetch products");
-        const data = await response.json();
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+setLoading(true);
+const response = await fetch(`${baseUrl}/api/v1/kits`);
+if (!response.ok) throw new Error("Failed to fetch products");
+const data = await response.json();
 
         const targetCategoryName = categoryMap[categoryId]?.toLowerCase();
 

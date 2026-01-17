@@ -68,7 +68,7 @@ const Hero = () => {
                 <div className="flex items-center gap-14">
                   <div>
                     <h2 className="max-w-[153px] font-semibold text-dark text-xl mb-20">
-                      <Link href="http://localhost:3000/shop/69599364f412c4afb08b8632">
+                      <Link href="https://circuit-sphere-ecommerce.onrender.com/shop/69599364f412c4afb08b8632">
                         SG90 Servo
                       </Link>
                     </h2>

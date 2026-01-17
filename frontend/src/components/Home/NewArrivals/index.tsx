@@ -8,37 +8,41 @@ const NewArrival = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchNewArrivals = async () => {
-      try {
-        // Fetch latest 8 items for New Arrivals
-        const response = await fetch("http://localhost:8000/api/v1/kits?limit=8");
-        if (!response.ok) throw new Error("Failed to fetch");
+useEffect(() => {
+  const fetchNewArrivals = async () => {
+    try {
+      // 1. Determine the API base URL dynamically
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-        const apiData = await response.json();
+      // 2. Use the dynamic URL to fetch the latest 8 items
+      const response = await fetch(`${baseUrl}/api/v1/kits?limit=8`);
+      
+      if (!response.ok) throw new Error("Failed to fetch");
 
-        // Map Backend Data -> Frontend Type
-        const mappedProducts: Product[] = apiData.map((item: any) => ({
-          id: item.id,
-          title: item.name,
-          price: item.price,
-          discountedPrice: item.price,
-          image: item.image_url ? [item.image_url] : ["/images/product/product-01.png"],
-          reviews: 50, // Static placeholder
-          category: item.category,
-          stock: item.stock_quantity,
-        }));
+      const apiData = await response.json();
 
-        setProducts(mappedProducts);
-      } catch (error) {
-        console.error("Error fetching new arrivals:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      // 3. Map Backend Data -> Frontend Type
+      const mappedProducts: Product[] = apiData.map((item: any) => ({
+        id: item.id,
+        title: item.name,
+        price: item.price,
+        discountedPrice: item.price,
+        image: item.image_url ? [item.image_url] : ["/images/product/product-01.png"],
+        reviews: 50, // Static placeholder
+        category: item.category,
+        stock: item.stock_quantity,
+      }));
 
-    fetchNewArrivals();
-  }, []);
+      setProducts(mappedProducts);
+    } catch (error) {
+      console.error("Error fetching new arrivals:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchNewArrivals();
+}, []);
 
   return (
     <section className="overflow-hidden pt-15">

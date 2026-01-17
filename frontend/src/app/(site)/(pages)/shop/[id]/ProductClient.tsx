@@ -23,8 +23,11 @@ const ProductClient = ({ id }: ProductClientProps) => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8000/api/v1/kits/${id}`);
-        if (!response.ok) throw new Error("Product not found");
+       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    
+    const response = await fetch(`${baseUrl}/api/v1/kits/${id}`);
+    
+    if (!response.ok) return { title: "Product Not Found | Circuit Sphere" };
         
         const item = await response.json();
 

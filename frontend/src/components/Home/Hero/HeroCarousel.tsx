@@ -100,7 +100,7 @@ const HeroCarousal = () => {
             </p>
 
             <Link
-              href="http://localhost:3000/shop/69599364f412c4afb08b8632"
+              href="https://circuit-sphere-ecommerce.onrender.com/shop/69599364f412c4afb08b8632"
               className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10"
             >
               Buy Now

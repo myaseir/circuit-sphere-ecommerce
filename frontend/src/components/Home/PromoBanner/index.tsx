@@ -110,7 +110,7 @@ const PromoBanner = () => {
               </span>
 
               <Link
-                href="http://localhost:3000/shop/69599364f412c4afb08b8632"
+                href="https://circuit-sphere-ecommerce.onrender.com/shop/69599364f412c4afb08b8632"
                 className="inline-flex font-medium text-custom-sm text-white bg-orange-500 py-2.5 px-8.5 rounded-md ease-out duration-200 hover:bg-orange-700"
               >
                 Buy Now

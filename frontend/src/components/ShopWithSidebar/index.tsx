@@ -53,42 +53,46 @@ const ShopWithSidebar = () => {
   }, [searchParams]);
 
   // ✅ 4. Robust Fetch Logic
-  const fetchProducts = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      
-      // Get the real category name by comparing the URL slug to our list
-      const categorySlug = searchParams.get("category");
-      const activeCategoryName = categories.find(cat => convertToSlug(cat.name) === categorySlug)?.name || "";
+const fetchProducts = useCallback(async () => {
+  try {
+    setIsLoading(true);
+    
+    // 1. Dynamically determine the API base URL
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-      // Increase limit to 100 to ensure all new products are visible
-      let url = `http://localhost:8000/api/v1/kits?skip=0&limit=100`; 
-      
-      if (activeCategoryName) {
-        url += `&category=${encodeURIComponent(activeCategoryName)}`;
-      }
+    // Get the real category name by comparing the URL slug to our list
+    const categorySlug = searchParams.get("category");
+    const activeCategoryName = categories.find(cat => convertToSlug(cat.name) === categorySlug)?.name || "";
 
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("API Error");
-      const apiData = await response.json();
-      
-      setProducts(apiData.map((item: any) => ({
-        id: item.id,
-        title: item.name,
-        price: item.price,
-        discountedPrice: item.price,
-        image: Array.isArray(item.image_url) ? [item.image_url[0]] : [item.image_url],
-        category: item.category,
-        stock: item.stock_quantity,
-        originalPrice: item.original_price,
-        isOnSale: item.on_sale,
-      })));
-    } catch (error) {
-      console.error("Fetch failed:", error);
-    } finally {
-      setIsLoading(false);
+    // 2. Build the URL using the dynamic baseUrl
+    // Increase limit to 100 to ensure all new products are visible
+    let url = `${baseUrl}/api/v1/kits?skip=0&limit=100`; 
+    
+    if (activeCategoryName) {
+      url += `&category=${encodeURIComponent(activeCategoryName)}`;
     }
-  }, [searchParams]); // Re-fetch whenever the URL changes
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("API Error");
+    const apiData = await response.json();
+    
+    setProducts(apiData.map((item: any) => ({
+      id: item.id,
+      title: item.name,
+      price: item.price,
+      discountedPrice: item.price,
+      image: Array.isArray(item.image_url) ? [item.image_url[0]] : [item.image_url],
+      category: item.category,
+      stock: item.stock_quantity,
+      originalPrice: item.original_price,
+      isOnSale: item.on_sale,
+    })));
+  } catch (error) {
+    console.error("Fetch failed:", error);
+  } finally {
+    setIsLoading(false);
+  }
+}, [searchParams, categories]); // Added 'categories' to dependencies for safety// Re-fetch whenever the URL changes
 
   useEffect(() => {
     fetchProducts();

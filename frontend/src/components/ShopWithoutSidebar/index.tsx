@@ -19,55 +19,58 @@ const ShopWithoutSidebar = () => {
 
   // ✅ Fetch Data from API
 // ✅ Fetch Data from API
-  const fetchProducts = async () => {
-    try {
-      setIsLoading(true);
-      const skip = (page - 1) * limit;
+ const fetchProducts = async () => {
+  try {
+    setIsLoading(true);
+    const skip = (page - 1) * limit;
 
-      // Fetching Laptops specifically
-      const response = await fetch(
-        `http://localhost:8000/api/v1/kits?skip=${skip}&limit=${limit}&category=Laptops`
-      );
+    // 1. Dynamically determine the API base URL
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+    // 2. Fetching Laptops specifically using the dynamic URL
+    const response = await fetch(
+      `${baseUrl}/api/v1/kits?skip=${skip}&limit=${limit}&category=Laptops`
+    );
+    
+    if (!response.ok) throw new Error("Failed to fetch");
+
+    const apiData = await response.json();
+
+    // ✅ Map Backend Data -> Frontend Product Type
+    const mappedProducts: Product[] = apiData.map((item: any) => {
       
-      if (!response.ok) throw new Error("Failed to fetch");
+      // Robust Image Logic (Same as your main Shop Page)
+      let safeImage = "/images/placeholder.svg";
+      if (Array.isArray(item.image_url) && item.image_url.length > 0) {
+          safeImage = item.image_url[0];
+      } else if (typeof item.image_url === "string" && item.image_url.trim() !== "") {
+          safeImage = item.image_url;
+      }
 
-      const apiData = await response.json();
-
-      // ✅ Map Backend Data -> Frontend Product Type
-      const mappedProducts: Product[] = apiData.map((item: any) => {
+      return {
+        id: item.id,
+        title: item.name,
+        price: item.price,
+        discountedPrice: item.price,
+        image: [safeImage], 
+        reviews: 50, 
+        category: item.category,
+        stock: item.stock_quantity,
         
-        // 1. Robust Image Logic (Same as your main Shop Page)
-        let safeImage = "/images/placeholder.svg";
-        if (Array.isArray(item.image_url) && item.image_url.length > 0) {
-           safeImage = item.image_url[0];
-        } else if (typeof item.image_url === "string" && item.image_url.trim() !== "") {
-           safeImage = item.image_url;
-        }
+        // ✅ Sale Data Mapping
+        originalPrice: item.original_price, 
+        isOnSale: item.on_sale,
+      };
+    });
 
-        return {
-          id: item.id,
-          title: item.name,
-          price: item.price,
-          discountedPrice: item.price,
-          image: [safeImage], 
-          reviews: 50, 
-          category: item.category,
-          stock: item.stock_quantity,
-          
-          // ✅ CRITICAL ADDITION: Map the Sale Data!
-          originalPrice: item.original_price, 
-          isOnSale: item.on_sale,
-        };
-      });
+    setProducts(mappedProducts); 
 
-      setProducts(mappedProducts); 
-
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  } catch (error) {
+    console.error("Error fetching products:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchProducts();

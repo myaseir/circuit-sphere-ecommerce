@@ -10,37 +10,41 @@ const BestSeller = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // ✅ Fetch Real Data from API
-  useEffect(() => {
-    const fetchBestSellers = async () => {
-      try {
-        // Fetch 6 items (You can sort by sales if your backend supports it later)
-        const response = await fetch("http://localhost:8000/api/v1/kits?limit=6");
-        if (!response.ok) throw new Error("Failed to fetch");
-        
-        const apiData = await response.json();
+useEffect(() => {
+  const fetchBestSellers = async () => {
+    try {
+      // 1. Get the base URL from environment variables
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-        // Map Backend -> Frontend Data Structure
-        const mappedProducts: Product[] = apiData.map((item: any) => ({
-          id: item.id,
-          title: item.name,
-          price: item.price,
-          discountedPrice: item.price, // Adjust if you have discounts
-          image: item.image_url ? [item.image_url] : ["/images/product/product-01.png"],
-          reviews: 50, // Static for now
-          category: item.category,
-          stock: item.stock_quantity,
-        }));
+      // 2. Fetch 6 items using the dynamic base URL
+      const response = await fetch(`${baseUrl}/api/v1/kits?limit=6`);
+      
+      if (!response.ok) throw new Error("Failed to fetch");
 
-        setProducts(mappedProducts);
-      } catch (error) {
-        console.error("Error fetching best sellers:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      const apiData = await response.json();
 
-    fetchBestSellers();
-  }, []);
+      // Map Backend -> Frontend Data Structure
+      const mappedProducts: Product[] = apiData.map((item: any) => ({
+        id: item.id,
+        title: item.name,
+        price: item.price,
+        discountedPrice: item.price, // Adjust if you have discounts in your Pydantic model
+        image: item.image_url ? [item.image_url] : ["/images/product/product-01.png"],
+        reviews: 50, // Static for now
+        category: item.category,
+        stock: item.stock_quantity,
+      }));
+
+      setProducts(mappedProducts);
+    } catch (error) {
+      console.error("Error fetching best sellers:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchBestSellers();
+}, []);
 
   return (
     <section className="overflow-hidden">

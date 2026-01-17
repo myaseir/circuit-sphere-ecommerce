@@ -16,8 +16,11 @@ const RelatedProducts = ({ currentProductId, category }: Props) => {
     const fetchRelated = async () => {
       try {
         // 1. Fetch all kits (or use a specific category endpoint if your API supports it)
-        const res = await fetch("http://localhost:8000/api/v1/kits");
-        const data = await res.json();
+      // This picks up the Render URL from Vercel or falls back to local for development
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+const res = await fetch(`${baseUrl}/api/v1/kits`);
+const data = await res.json();
 
         // 2. FILTER LOGIC:
         // - Must match the Category
