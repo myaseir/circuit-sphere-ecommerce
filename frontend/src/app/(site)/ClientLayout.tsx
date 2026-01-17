@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 // keeping your exact relative paths
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { ModalProvider } from "../context/QuickViewModalContext";
 import { CartModalProvider } from "../context/CartSidebarModalContext";
 import { ReduxProvider } from "@/redux/provider";

@@ -1,6 +1,6 @@
 import Home from "@/components/Home";
 import { Metadata } from "next";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 export const metadata: Metadata = {
   // ✅ 1. Strong Title: Brand Name + Main Keyword + Location
   title: "Circuit Sphere | Pakistan's #1 Robotics & Electronics Store",

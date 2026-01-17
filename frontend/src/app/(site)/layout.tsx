@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import ClientLayout from "./ClientLayout"; 
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 // ✅ YOUR CSS IMPORTS (Must be here for Global Styles)
 import "../css/euclid-circular-a-font.css";
 import "../css/style.css";
