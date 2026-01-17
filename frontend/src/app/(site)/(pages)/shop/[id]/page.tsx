@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
 
   try {
-    const response = await fetch(`http://localhost:8000/api/v1/kits/${id}`);
+    const response = await fetch(`https://circuit-sphere-ecommerce.onrender.com/api/v1/kits/${id}`);
     
     if (!response.ok) return { title: "Product Not Found | Circuit Sphere" };
 

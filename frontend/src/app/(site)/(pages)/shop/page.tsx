@@ -33,7 +33,7 @@ const ShopContent = () => {
     const fetchFilteredProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8000/api/v1/kits`);
+        const response = await fetch(`https://circuit-sphere-ecommerce.onrender.com/api/v1/kits`);
         if (!response.ok) throw new Error("Failed to fetch products");
         const data = await response.json();
 
