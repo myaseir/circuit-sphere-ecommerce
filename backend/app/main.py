@@ -36,12 +36,12 @@ app = FastAPI(
 )
 
 # CORS middleware
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    # Directly listing the URLs here overrides the settings file
     allow_origins=[
         "http://localhost:3000",
-        "https://circuit-sphere-ecommerce-7b5k.vercel.app/" # <--- YOUR VERCEL URL
+        "https://circuit-sphere-ecommerce-7b5k.vercel.app", # Removed the trailing slash
     ],
     allow_credentials=True,
     allow_methods=["*"],
