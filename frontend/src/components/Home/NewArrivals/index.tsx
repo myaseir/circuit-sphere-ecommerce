@@ -2,52 +2,68 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Product } from "@/types/product"; 
-import SingleGridItem from "../../Shop/SingleGridItem"; // ✅ Use the consistent card component
+import SingleGridItem from "../../Shop/SingleGridItem";
 
 const NewArrival = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-useEffect(() => {
-  const fetchNewArrivals = async () => {
-    try {
-      // 1. Determine the API base URL dynamically
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  useEffect(() => {
+    const fetchNewArrivals = async () => {
+      try {
+        // 1. Determine the API base URL dynamically
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-      // 2. Use the dynamic URL to fetch the latest 8 items
-      const response = await fetch(`${baseUrl}/api/v1/kits?limit=8`);
-      
-      if (!response.ok) throw new Error("Failed to fetch");
+        // 2. Fetch the latest 8 items
+        const response = await fetch(`${baseUrl}/api/v1/kits?limit=8`);
+        
+        if (!response.ok) throw new Error("Failed to fetch");
 
-      const apiData = await response.json();
+        const apiData = await response.json();
 
-      // 3. Map Backend Data -> Frontend Type
-      const mappedProducts: Product[] = apiData.map((item: any) => ({
-        id: item.id,
-        title: item.name,
-        price: item.price,
-        discountedPrice: item.price,
-        image: item.image_url ? [item.image_url] : ["/images/product/product-01.png"],
-        reviews: 50, // Static placeholder
-        category: item.category,
-        stock: item.stock_quantity,
-      }));
+        // 3. Robust Image & Data Mapping
+        const mappedProducts: Product[] = apiData.map((item: any) => {
+          // Logic to ensure we extract a valid string for the image URL
+          let finalImage = "/images/product/product-01.png"; // Default fallback
 
-      setProducts(mappedProducts);
-    } catch (error) {
-      console.error("Error fetching new arrivals:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+          if (Array.isArray(item.image_url) && item.image_url.length > 0) {
+            // If backend sends an array, pick the first string
+            finalImage = item.image_url[0];
+          } else if (typeof item.image_url === "string" && item.image_url.trim() !== "") {
+            // If backend sends a direct string
+            finalImage = item.image_url;
+          }
 
-  fetchNewArrivals();
-}, []);
+          return {
+            id: item.id,
+            title: item.name,
+            price: item.price,
+            discountedPrice: item.price,
+            // SingleGridItem usually expects an array of strings for the image field
+            image: [finalImage], 
+            reviews: 50, 
+            category: item.category,
+            stock: item.stock_quantity,
+            originalPrice: item.original_price,
+            isOnSale: item.on_sale,
+          };
+        });
+
+        setProducts(mappedProducts);
+      } catch (error) {
+        console.error("Error fetching new arrivals:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchNewArrivals();
+  }, []);
 
   return (
     <section className="overflow-hidden pt-15">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
-        {/* */}
+        
         <div className="mb-7 flex items-center justify-between">
           <div>
             <span className="flex items-center gap-2.5 font-medium text-dark mb-1.5">
@@ -85,18 +101,21 @@ useEffect(() => {
           </Link>
         </div>
 
-        {/* ✅ Dynamic Grid */}
+        {/* Dynamic Grid */}
         {isLoading ? (
-          <div className="text-center py-10">Loading New Arrivals...</div>
+          <div className="flex justify-center py-20">
+             <div className="animate-spin h-10 w-10 border-4 border-blue border-t-transparent rounded-full"></div>
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-7.5 gap-y-9">
             {products.length > 0 ? (
               products.map((item, key) => (
-                // ✅ Use SingleGridItem
-                <SingleGridItem item={item} key={key} />
+                <SingleGridItem item={item} key={item.id || key} />
               ))
             ) : (
-              <div className="col-span-full text-center">No new arrivals found.</div>
+              <div className="col-span-full text-center py-10 text-gray-400">
+                No new arrivals found.
+              </div>
             )}
           </div>
         )}
