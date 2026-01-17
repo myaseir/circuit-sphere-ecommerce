@@ -50,8 +50,12 @@ const ProductPage = async ({ params }: Props) => {
   const { id } = await params;
 
   let product = null;
-  try {
-    const res = await fetch(`http://localhost:8000/api/v1/kits/${id}`);
+try {
+    // Defines the Base URL: Uses the Env Variable if it exists, otherwise defaults to localhost
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    
+    const res = await fetch(`${baseUrl}/api/v1/kits/${id}`);
+    
     if (res.ok) {
       product = await res.json();
     }
