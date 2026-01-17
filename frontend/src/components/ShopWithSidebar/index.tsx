@@ -2,75 +2,56 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Breadcrumb from "../Common/Breadcrumb";
-import CustomSelect from "./CustomSelect";
-import CategoryDropdown from "./CategoryDropdown";
 import SingleGridItem from "../Shop/SingleGridItem";
 import SingleListItem from "../Shop/SingleListItem";
 import { Product } from "@/types/product";
 
-// --- STATIC HELPERS (Outside component to prevent re-renders) ---
-
+// --- HELPERS ---
 const convertToSlug = (text: string) => {
-  return text
-    .toLowerCase()
-    .replace(/[^\w ]+/g, '') // Removes special chars
-    .replace(/ +/g, '-');    // Replaces spaces with -
+  return text.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 };
 
 const categories = [
-  { name: "Microcontrollers & Development Boards", products: 34 },
-  { name: "Robotics & Mechanical Actuators", products: 40 },
-  { name: "FYP (Final Year Project) Kits", products: 35 },
-  { name: "Computer Storage & Speed Upgrades", products: 20 },
-  { name: "IoT Sensors & Environmental Modules", products: 60 },
-  { name: "Smart Home Automation", products: 30 },
-  { name: "Batteries & Power Management (BMS)", products: 21 },
-  { name: "Wireless Communication Modules", products: 22 },
-  { name: "Solar Electronics & DC Protection", products: 23 },
-  { name: "Prototyping Tools & Consumables", products: 23 },
+  { name: "Microcontrollers & Development Boards" },
+  { name: "Robotics & Mechanical Actuators" },
+  { name: "FYP (Final Year Project) Kits" },
+  { name: "Computer Storage & Speed Upgrades" },
+  { name: "IoT Sensors & Environmental Modules" },
+  { name: "Smart Home Automation" },
+  { name: "Batteries & Power Management (BMS)" },
+  { name: "Wireless Communication Modules" },
+  { name: "Solar Electronics & DC Protection" },
+  { name: "Prototyping Tools & Consumables" },
 ];
-
-// --- COMPONENT ---
 
 const ShopWithSidebar = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // State
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [productStyle, setProductStyle] = useState("grid");
   const [productSidebar, setProductSidebar] = useState(false);
-  
-  // Derived state for the UI title
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategoryName, setSelectedCategoryName] = useState("");
 
-  // 1. Fetch Logic (useCallback)
   const fetchProducts = useCallback(async () => {
     try {
       setIsLoading(true);
-      
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const categorySlug = searchParams.get("category") || "";
+      const found = categories.find(cat => convertToSlug(cat.name) === categorySlug);
+      const activeName = found ? found.name : "";
       
-      // Match slug back to real category name for the API
-      const foundCategory = categories.find(cat => convertToSlug(cat.name) === categorySlug);
-      const activeCategoryName = foundCategory ? foundCategory.name : "";
-      
-      // Update the UI title state
-      setSelectedCategory(activeCategoryName);
+      setSelectedCategoryName(activeName);
 
       let url = `${baseUrl}/api/v1/kits?skip=0&limit=100`; 
-      if (activeCategoryName) {
-        url += `&category=${encodeURIComponent(activeCategoryName)}`;
-      }
+      if (activeName) url += `&category=${encodeURIComponent(activeName)}`;
 
       const response = await fetch(url);
       if (!response.ok) throw new Error("API Error");
-      
       const apiData = await response.json();
       
-      const mappedData = apiData.map((item: any) => ({
+      setProducts(apiData.map((item: any) => ({
         id: item.id,
         title: item.name,
         price: item.price,
@@ -80,22 +61,18 @@ const ShopWithSidebar = () => {
         stock: item.stock_quantity,
         originalPrice: item.original_price,
         isOnSale: item.on_sale,
-      }));
-
-      setProducts(mappedData);
+      })));
     } catch (error) {
       console.error("Fetch failed:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [searchParams]); // Only re-create if searchParams change
+  }, [searchParams]);
 
-  // 2. Trigger Fetch on mount or URL change
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  // 3. Navigation Handler
   const handleCategoryChange = (categoryName: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (categoryName) {
@@ -103,104 +80,111 @@ const ShopWithSidebar = () => {
     } else {
       params.delete("category");
     }
-    
     setProductSidebar(false);
-    // Push update to URL
     router.push(`/shop-with-sidebar?${params.toString()}`, { scroll: false });
   };
 
   return (
     <>
       <Breadcrumb
-        title={selectedCategory ? selectedCategory : "Explore All Products"}
+        title={selectedCategoryName ? selectedCategoryName : "All Electronics"}
         pages={["shop", "/", "Results"]}
       />
 
-      <section className="overflow-hidden relative pb-20 pt-5 lg:pt-20 xl:pt-28 bg-[#f3f4f6]">
-        <div className="max-w-[1170px] w-auto mx-auto px-4 sm:px-8 xl:px-0">
-          <div className="flex gap-7.5">
-            
-            {/* Sidebar Section */}
-            <div className={`sidebar-content fixed xl:z-1 z-9999 left-0 top-0 xl:translate-x-0 xl:static max-w-[310px] xl:max-w-[270px] w-full ease-out duration-200 ${
-              productSidebar ? "translate-x-0 bg-white p-5 h-screen overflow-y-auto" : "-translate-x-full"
-            }`}>
-              <div className="flex flex-col gap-6">
-                <div className="bg-white shadow-1 rounded-lg py-4 px-5 flex items-center justify-between">
-                  <p className="font-medium text-dark">Filters:</p>
-                  <button 
-                    onClick={() => handleCategoryChange("")} 
-                    className="text-blue text-xs hover:underline"
-                  >
-                    Clear All
-                  </button>
-                </div>
-                
-                <CategoryDropdown 
-                  categories={categories} 
-                  onSelectCategory={handleCategoryChange} 
-                  selectedCategory={selectedCategory} 
-                />
-              </div>
-            </div>
+      <section className="relative pb-20 pt-6 bg-[#f9fafb]">
+        <div className="max-w-[1170px] mx-auto px-4 lg:px-8">
+          
+          {/* MOBILE OVERLAY */}
+          <div 
+            className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] xl:hidden transition-all duration-300 ${
+              productSidebar ? "opacity-100 visible" : "opacity-0 invisible"
+            }`}
+            onClick={() => setProductSidebar(false)}
+          />
 
-            {/* Main Content Section */}
-            <div className="xl:max-w-[870px] w-full">
-              
-              {/* Toolbar */}
-              <div className="rounded-lg bg-white shadow-1 pl-3 pr-2.5 py-2.5 mb-6 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                   <CustomSelect options={[{ label: "Latest Products", value: "0" }]} />
-                   <p className="text-sm">
-                     Showing <span className="text-dark font-bold">{products.length}</span> Products
-                   </p>
+          <div className="flex flex-col xl:flex-row gap-6">
+            
+            {/* SIDEBAR - Slimmer Desktop Width (240px) */}
+            <aside className={`fixed top-0 left-0 h-full w-[85%] max-w-[340px] bg-white z-[10001] shadow-2xl transition-transform duration-500 ease-in-out xl:static xl:translate-x-0 xl:z-1 xl:w-[240px] xl:bg-transparent xl:shadow-none ${
+              productSidebar ? "translate-x-0" : "-translate-x-full"
+            }`}>
+              <div className="flex flex-col h-full">
+                <div className="p-6 border-b border-gray-100 xl:hidden flex items-center justify-between bg-white">
+                  <div>
+                    <h3 className="text-xl font-bold text-dark">Categories</h3>
+                  </div>
+                  <button onClick={() => setProductSidebar(false)} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-dark">✕</button>
                 </div>
-                
-                {/* Mobile Sidebar Toggle */}
+
+                <div className="flex-1 overflow-y-auto p-6 xl:p-0">
+                  <div className="flex flex-col gap-1.5">
+                    <h4 className="hidden xl:block font-bold text-dark mb-4 text-base">Categories</h4>
+                    <button
+                      onClick={() => handleCategoryChange("")}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg transition-all text-sm font-medium ${
+                        selectedCategoryName === "" 
+                        ? "bg-blue text-white shadow-md shadow-blue/20" 
+                        : "text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      All Products
+                    </button>
+                    {categories.map((cat) => (
+                      <button
+                        key={cat.name}
+                        onClick={() => handleCategoryChange(cat.name)}
+                        className={`w-full text-left px-3 py-2.5 rounded-lg transition-all text-xs font-medium leading-tight ${
+                          selectedCategoryName === cat.name 
+                          ? "bg-blue text-white shadow-md shadow-blue/20" 
+                          : "text-gray-600 hover:bg-gray-100"
+                        }`}
+                      >
+                        {cat.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            {/* MAIN CONTENT - Expands to fill the space */}
+            <div className="flex-1">
+              <div className="bg-white rounded-2xl p-4 mb-8 flex items-center justify-between shadow-sm border border-gray-100">
                 <button 
                   onClick={() => setProductSidebar(true)}
-                  className="xl:hidden text-sm font-medium text-blue"
+                  className="xl:hidden flex items-center gap-2 px-4 py-2 bg-blue text-white rounded-lg font-bold text-sm"
                 >
-                  Filters
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M4 6h16M4 12h16m-7 6h7" /></svg>
+                  Filter
                 </button>
 
-                <div className="flex items-center gap-2.5">
-                  <button 
-                    onClick={() => setProductStyle("grid")} 
-                    className={`${productStyle === "grid" ? "bg-blue text-white" : "bg-gray-1"} w-10.5 h-9 rounded border flex items-center justify-center transition-all`}
-                  >
-                    Grid
+                <p className="text-sm font-medium text-gray-400">
+                  <span className="text-dark font-bold">{products.length}</span> items found
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setProductStyle("grid")} className={`p-1.5 rounded-md ${productStyle === "grid" ? "bg-blue text-white" : "bg-gray-50 text-gray-400"}`}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3V3zm0 10h8v8H3v-8zM13 3h8v8h-8V3zm0 10h8v8h-8v-8z"/></svg>
                   </button>
-                  <button 
-                    onClick={() => setProductStyle("list")} 
-                    className={`${productStyle === "list" ? "bg-blue text-white" : "bg-gray-1"} w-10.5 h-9 rounded border flex items-center justify-center transition-all`}
-                  >
-                    List
+                  <button onClick={() => setProductStyle("list")} className={`p-1.5 rounded-md ${productStyle === "list" ? "bg-blue text-white" : "bg-gray-50 text-gray-400"}`}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></svg>
                   </button>
                 </div>
               </div>
 
-              {/* Product Display Logic */}
               {isLoading ? (
-                <div className="flex justify-center py-32">
-                  <div className="animate-spin h-10 w-10 border-4 border-blue border-t-transparent rounded-full"></div>
+                <div className="flex justify-center py-40">
+                  <div className="w-10 h-10 border-4 border-blue border-t-transparent rounded-full animate-spin"></div>
                 </div>
               ) : (
-                <div className={productStyle === "grid" 
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-7.5 gap-y-9" 
-                  : "flex flex-col gap-7.5"
-                }>
+                <div className={productStyle === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
                   {products.length > 0 ? (
-                    products.map((item, index) => (
-                      productStyle === "grid" 
-                        ? <SingleGridItem item={item} key={item.id || index} /> 
-                        : <SingleListItem item={item} key={item.id || index} />
+                    products.map((item, i) => (
+                      <SingleGridItem key={item.id || i} item={item} />
                     ))
                   ) : (
-                    <div className="col-span-full flex flex-col items-center justify-center py-32 text-center">
-                      <p className="text-xl font-medium text-dark/60">No products found</p>
-                      <p className="text-sm text-gray-400 mt-2">
-                        Try clearing filters or checking your database for category: "{selectedCategory}"
-                      </p>
+                    <div className="col-span-full py-20 text-center bg-white rounded-2xl border-2 border-dashed border-gray-100">
+                      <p className="text-gray-400">No components found.</p>
                     </div>
                   )}
                 </div>
