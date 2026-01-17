@@ -85,8 +85,8 @@ const Header = () => {
           {/* */}
           <div className="xl:w-auto flex-col sm:flex-row w-full flex sm:justify-between sm:items-center gap-5 sm:gap-10">
            <Image
-  src="https://res.cloudinary.com/dxxqrjnje/image/upload/v1768499673/electronic_kits/pydpcnosjeguuoqd3xd7.png"
-  alt="Circuit Sphere - Electronics Store Pakistan" // ✅ Keyword Rich
+  src="https://res.cloudinary.com/dxxqrjnje/image/upload/v1768661829/electronic_kits/db2rpvqtznxdtojmvcxb.png"
+  alt="Glacia Labs - Electronics Store Pakistan" // ✅ Keyword Rich
   width={219}
   height={36}
   priority // ✅ Loads logo faster (LCP optimization)

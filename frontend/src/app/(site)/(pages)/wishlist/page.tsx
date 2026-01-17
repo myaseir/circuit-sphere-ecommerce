@@ -3,9 +3,17 @@ import { Wishlist } from "@/components/Wishlist";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Wishlist Page | NextCommerce Nextjs E-commerce template",
-  description: "This is Wishlist Page for NextCommerce Template",
-  // other metadata
+  // ✅ Personal & Branded Title
+  title: "My Wishlist | Glacia Labs",
+  
+  // ✅ Functional Description
+  description: "Save your favorite Arduino boards, sensors, and robotics parts for later at Glacia Labs.",
+
+  // ✅ SEO SECURITY: Prevents Google from indexing private user lists
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 const WishlistPage = () => {

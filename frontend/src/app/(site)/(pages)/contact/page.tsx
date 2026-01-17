@@ -1,10 +1,27 @@
+import React from "react";
 import Contact from "@/components/Contact";
-
 import { Metadata } from "next";
+
 export const metadata: Metadata = {
-  title: "Contact Page | NextCommerce Nextjs E-commerce template",
-  description: "This is Contact Page for NextCommerce Template",
-  // other metadata
+  // ✅ Professional Title
+  title: "Contact Us | Glacia Labs",
+  
+  // ✅ Customer-Service Focused Description
+  description: "Get in touch with Glacia Labs for support with your orders, technical questions about Arduino & ESP32, or business inquiries.",
+
+  // ✅ SEO: Canonical URL
+  alternates: {
+    canonical: "https://www.glacialabs.com/contact",
+  },
+
+  // ✅ Social Sharing
+  openGraph: {
+    title: "Contact Glacia Labs Support",
+    description: "Need help with your electronics project? Contact our support team.",
+    url: "https://www.glacialabs.com/contact",
+    siteName: "Glacia Labs",
+    type: "website",
+  },
 };
 
 const ContactPage = () => {

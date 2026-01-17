@@ -1,10 +1,19 @@
-import Signin from "@/components/Auth/Signin";
 import React from "react";
+import Signin from "@/components/Auth/Signin";
 import { Metadata } from "next";
+
 export const metadata: Metadata = {
-  title: "Signin Page | NextCommerce Nextjs E-commerce template",
-  description: "This is Signin Page for NextCommerce Template",
-  // other metadata
+  // ✅ Brand Update
+  title: "Sign In | Glacia Labs",
+  
+  // ✅ Secure Description
+  description: "Log in to your Glacia Labs account to manage orders and view your purchase history.",
+
+  // ✅ SEO SECURITY: Prevents Google from indexing the login page
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 const SigninPage = () => {

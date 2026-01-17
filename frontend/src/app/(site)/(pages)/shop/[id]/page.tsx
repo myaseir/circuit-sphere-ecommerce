@@ -23,22 +23,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const socialImage = Array.isArray(product.image_url) ? product.image_url[0] : product.image_url;
 
     return {
-      title: `${product.name} | Circuit Sphere`,
+      title: `${product.name} | Glacia Labs`,
       description: product.description || "Buy high-quality electronics in Pakistan.",
       alternates: {
-        canonical: `https://circuitsphere.pk/shop/${product.id}`,
+        canonical: `https://www.glacialabs.com/shop/${product.id}`,
       },
       openGraph: {
         title: product.name,
         description: "Best Price in Pakistan. Fast Shipping.",
         images: socialImage ? [socialImage] : [],
-        url: `https://circuitsphere.pk/shop/${product.id}`,
+        url: `https://www.glacialabs.com/shop/${product.id}`,
         type: "website",
       },
     };
   } catch (error) {
     return { 
-      title: "Shop Electronics | Circuit Sphere",
+      title: "Shop Electronics | Glacia Labs",
       description: "Best online store for robotics and electronics in Pakistan."
     };
   }

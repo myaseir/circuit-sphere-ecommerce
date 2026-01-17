@@ -5,8 +5,10 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin/', '/account/', '/checkout/'], // Don't let Google index private pages
+      // These are good. Prevents Google from indexing cart/login pages.
+      disallow: ['/admin/', '/account/', '/checkout/'], 
     },
-    sitemap: 'https://circuitsphere.pk/sitemap.xml',
+    // ✅ CRITICAL FIX: Must match the domain this code is deployed to
+    sitemap: 'https://www.glacialabs.com/sitemap.xml',
   };
 }
