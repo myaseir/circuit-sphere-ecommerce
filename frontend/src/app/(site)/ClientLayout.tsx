@@ -23,35 +23,38 @@ export default function ClientLayout({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer); // Good practice to cleanup timer
   }, []);
 
   return (
     <>
-      {loading ? (
-        <PreLoader />
-      ) : (
-        <ReduxProvider>
-          <CartModalProvider>
-            <ModalProvider>
-              <PreviewSliderProvider>
-                <Header />
-                {children}
+      {/* ✅ 1. Always render the Providers & Content so Google sees them immediately */}
+      <ReduxProvider>
+        <CartModalProvider>
+          <ModalProvider>
+            <PreviewSliderProvider>
+              <Header />
+              {children}
 
-                <QuickViewModal />
-                <CartSidebarModal />
-                <PreviewSliderModal />
-              </PreviewSliderProvider>
-            </ModalProvider>
-          </CartModalProvider>
-        </ReduxProvider>
+              <QuickViewModal />
+              <CartSidebarModal />
+              <PreviewSliderModal />
+            </PreviewSliderProvider>
+          </ModalProvider>
+        </CartModalProvider>
+      </ReduxProvider>
+
+      {/* ✅ 2. Show PreLoader as an OVERLAY on top (if loading) */}
+      {loading && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "white" }}>
+          <PreLoader />
+        </div>
       )}
-      {!loading && (
-        <>
-          <ScrollToTop />
-          <Footer />
-        </>
-      )}
+
+      {/* Footer & ScrollToTop can stay visible or wait, usually fine to show immediately */}
+      <ScrollToTop />
+      <Footer />
     </>
   );
 }
