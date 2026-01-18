@@ -40,7 +40,7 @@ const SingleItem = ({ item, removeItemFromCart }: { item: any, removeItemFromCar
           </h3>
           <p className="text-custom-sm">
             {/* ✅ Safe Price Display */}
-            Price: ${(item.discountedPrice || item.price).toFixed(2)}
+            Price: PKR {(item.discountedPrice || item.price).toFixed(2)}
           </p>
           <p className="text-xs text-gray-500 mt-1">Qty: {item.quantity}</p>
         </div>
