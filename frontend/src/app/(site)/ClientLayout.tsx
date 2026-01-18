@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 // keeping your exact relative paths
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+// ❌ REMOVED: import { SpeedInsights }... (It's already in layout.tsx)
+
 import { ModalProvider } from "../context/QuickViewModalContext";
 import { CartModalProvider } from "../context/CartSidebarModalContext";
 import { ReduxProvider } from "@/redux/provider";
@@ -23,13 +24,12 @@ export default function ClientLayout({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timer); // Good practice to cleanup timer
+    // ✅ Keep this: Instant loading for better LCP
+    setLoading(false);
   }, []);
 
   return (
     <>
-      {/* ✅ 1. Always render the Providers & Content so Google sees them immediately */}
       <ReduxProvider>
         <CartModalProvider>
           <ModalProvider>
@@ -45,14 +45,14 @@ export default function ClientLayout({
         </CartModalProvider>
       </ReduxProvider>
 
-      {/* ✅ 2. Show PreLoader as an OVERLAY on top (if loading) */}
       {loading && (
         <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "white" }}>
           <PreLoader />
         </div>
       )}
 
-      {/* Footer & ScrollToTop can stay visible or wait, usually fine to show immediately */}
+      {/* ❌ REMOVED: <SpeedInsights /> (Already in layout.tsx) */}
+
       <ScrollToTop />
       <Footer />
     </>

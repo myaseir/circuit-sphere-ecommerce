@@ -13,15 +13,18 @@ const Hero = () => {
           {/* ================= LEFT SIDE: MAIN CAROUSEL ================= */}
           <div className="xl:max-w-[757px] w-full">
             <div className="relative z-1 rounded-[10px] bg-white overflow-hidden">
-              {/* Bg shapes - Decorative, can be lazy loaded */}
+              
+              {/* ✅ FIX APPLIED: Changed 'loading="lazy"' to 'priority' */}
+              {/* This fixes the "LCP request discovery" error in your audit */}
               <Image
                 src="/images/hero/hero-bg.png"
                 alt="hero bg shapes"
                 className="absolute right-0 bottom-0 -z-1"
                 width={534}
                 height={520}
-                loading="lazy"
+                priority 
               />
+              
               <HeroCarousel />
             </div>
           </div>
@@ -61,7 +64,6 @@ const Hero = () => {
                       alt="Smart WiFi Water Tank Automation Kit"
                       width={173}
                       height={181}
-                      // ✅ ADDED SIZES: Tells browser this image is small (approx 173px)
                       sizes="(max-width: 768px) 150px, 173px"
                       className="object-contain"
                     />
@@ -74,7 +76,6 @@ const Hero = () => {
                 <div className="flex items-center gap-14">
                   <div>
                     <h2 className="max-w-[153px] font-semibold text-dark text-xl mb-20">
-                      {/* ✅ FIXED: Changed external render link to internal relative link */}
                       <Link href="/shop/69599364f412c4afb08b8632" className="hover:text-blue transition-colors">
                         SG90 Servo
                       </Link>
@@ -101,7 +102,6 @@ const Hero = () => {
                       alt="SG90 Micro Servo Motor"
                       width={223}
                       height={261}
-                      // ✅ ADDED SIZES: Tells browser this image is small
                       sizes="(max-width: 768px) 150px, 223px"
                       className="object-contain"
                     />
@@ -114,7 +114,6 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Hero features (Free Shipping, etc) */}
       <HeroFeature />
     </section>
   );

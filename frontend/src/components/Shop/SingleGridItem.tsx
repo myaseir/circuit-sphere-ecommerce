@@ -10,7 +10,13 @@ import { AppDispatch } from "@/redux/store";
 import Link from "next/link";
 import Image from "next/image";
 
-const SingleGridItem = ({ item }: { item: Product }) => {
+// ✅ 1. Update Interface to accept 'priority'
+interface SingleGridItemProps {
+  item: Product;
+  priority?: boolean; // Optional prop
+}
+
+const SingleGridItem = ({ item, priority = false }: SingleGridItemProps) => {
   const { openModal } = useModalContext();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -36,27 +42,17 @@ const SingleGridItem = ({ item }: { item: Product }) => {
     dispatch(addItemToWishlist({ ...item, status: "available", quantity: 1 }));
   };
 
-  // -------------------------------------------------------
-  // ✅ SMART PRICE LOGIC
-  // -------------------------------------------------------
-  
-  // 1. Determine "Effective Price" (What the user PAYS)
-  // If sale is OFF and we have an original price, revert to Original Price.
-  // Otherwise, use the current database price.
+  // SMART PRICE LOGIC
   const effectivePrice = (!item.isOnSale && item.originalPrice) 
       ? item.originalPrice 
       : item.price;
 
-  // 2. Determine if Sale Badge should show
-  // Only show if sale is ON, and Original is strictly greater than current Price
   const isSaleActive = item.isOnSale && item.originalPrice && item.originalPrice > item.price;
 
-  // 3. Calculate Discount %
   const discountPercentage = isSaleActive 
     ? Math.round(((item.originalPrice! - item.price) / item.originalPrice!) * 100) 
     : 0;
 
-  // ✅ Updated AddToCart (Uses effectivePrice)
   const handleAddToCart = () => {
     dispatch(addItemToCart({ ...item, price: effectivePrice, quantity: 1 }));
   };
@@ -78,8 +74,11 @@ const SingleGridItem = ({ item }: { item: Product }) => {
               src={getImageUrl()}
               alt={item.title || "Product Image"}
               fill
+              // ✅ 2. Pass the priority prop here
+              priority={priority} 
               className="object-contain transition-transform duration-300 group-hover:scale-110" 
-              sizes="(max-width: 768px) 100vw, 250px"
+              // Optimization: On mobile grids (usually 2 columns), 50vw is more accurate than 100vw
+              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 250px"
             />
           </div>
         </Link>
@@ -100,24 +99,15 @@ const SingleGridItem = ({ item }: { item: Product }) => {
         </div>
       </div>
 
-      {/* <div className="flex items-center gap-2.5 mb-2">
-        <div className="flex items-center gap-1">
-          {[...Array(5)].map((_, i) => <Image key={i} src="/images/icons/icon-star.svg" alt="star icon" width={14} height={14} />)}
-        </div>
-        <p className="text-custom-sm text-gray-500">({item.reviews || 0})</p>
-      </div> */}
-
       <h3 className="font-medium text-dark mb-1.5 transition-colors hover:text-blue line-clamp-1">
         <Link href={`/shop/${item.id}`}>{item.title}</Link>
       </h3>
 
-      {/* ✅ Price Section (Shows Effective Price) */}
       <span className="flex items-center gap-2 font-medium text-lg">
         <span className="text-blue">
           PKR {effectivePrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
         </span>
         
-        {/* Only show crossed-out price if sale is actively ON */}
         {isSaleActive && (
           <span className="text-gray-400 line-through text-sm font-normal">
             PKR {item.originalPrice!.toLocaleString(undefined, { minimumFractionDigits: 2 })}

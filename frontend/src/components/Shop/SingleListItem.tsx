@@ -10,27 +10,29 @@ import { AppDispatch } from "@/redux/store";
 import Link from "next/link";
 import Image from "next/image";
 
-const SingleListItem = ({ item }: { item: Product }) => {
+// ✅ 1. Update Interface to accept 'priority' (Good practice)
+interface SingleListItemProps {
+  item: Product;
+  priority?: boolean;
+}
+
+const SingleListItem = ({ item, priority = false }: SingleListItemProps) => {
   const { openModal } = useModalContext();
   const dispatch = useDispatch<AppDispatch>();
 
-  // ✅ ROBUST IMAGE HELPER
+  // ROBUST IMAGE HELPER
   const getImageUrl = () => {
     const placeholder = "/images/product/product-01.png";
-    
-    // Check array
     if (Array.isArray(item.image) && item.image.length > 0) {
       const firstImage = item.image[0];
       if (typeof firstImage === "string" && firstImage.trim() !== "") {
         return firstImage;
       }
     }
-    // Check string
     if (typeof item.image === "string") {
       const imgStr = item.image as string;
       if (imgStr.trim() !== "") return imgStr;
     }
-    // Legacy support
     if (item.imgs?.previews && item.imgs.previews.length > 0) {
       return item.imgs.previews[0];
     }
@@ -41,7 +43,10 @@ const SingleListItem = ({ item }: { item: Product }) => {
     dispatch(updateQuickView({ ...item }));
   };
 
+  // ✅ Updated AddToCart (Uses effectivePrice logic if needed)
   const handleAddToCart = () => {
+    // If you want consistent logic with Grid Item, you can calculate effectivePrice here too.
+    // For now, using item.price as per your code.
     dispatch(addItemToCart({ ...item, quantity: 1 }));
   };
 
@@ -49,9 +54,7 @@ const SingleListItem = ({ item }: { item: Product }) => {
     dispatch(addItemToWishlist({ ...item, status: "available", quantity: 1 }));
   };
 
-  // -------------------------------------------------------
-  // ✅ LOGIC: Sale Status & Calculation
-  // -------------------------------------------------------
+  // LOGIC: Sale Status & Calculation
   const isSaleActive = item.isOnSale && item.originalPrice && item.originalPrice > item.price;
 
   const discountPercentage = isSaleActive 
@@ -65,7 +68,7 @@ const SingleListItem = ({ item }: { item: Product }) => {
         {/* Product Image Wrapper */}
         <div className="relative overflow-hidden flex items-center justify-center max-w-[270px] w-full sm:min-h-[270px] p-4 bg-gray-50">
           
-          {/* ✅ Discount Badge (Only shows if Sale is Active) */}
+          {/* Discount Badge */}
           {isSaleActive && (
             <span className="absolute top-3 left-3 z-10 inline-flex items-center justify-center rounded-md bg-red-600 px-2.5 py-1 text-xs font-bold text-white uppercase shadow-sm animate-pulse">
               -{discountPercentage}%
@@ -79,6 +82,10 @@ const SingleListItem = ({ item }: { item: Product }) => {
                 src={getImageUrl()}
                 alt={item.title || "Product Image"}
                 fill
+                // ✅ 2. Pass Priority Prop
+                priority={priority}
+                // ✅ 3. Added Sizes Prop (Crucial for list views)
+                sizes="(max-width: 640px) 100vw, 270px"
                 className="object-contain transition-transform duration-300 group-hover:scale-110"
               />
             </div>
@@ -92,6 +99,7 @@ const SingleListItem = ({ item }: { item: Product }) => {
                 handleQuickViewUpdate();
               }}
               className="flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 text-dark bg-white hover:text-blue transition-colors"
+              title="Quick View"
             >
               <svg className="fill-current" width="16" height="16" viewBox="0 0 16 16">
                 <path d="M8.00016 5.5C6.61945 5.5 5.50016 6.61929 5.50016 8C5.50016 9.38071 6.61945 10.5 8.00016 10.5C9.38087 10.5 10.5002 9.38071 10.5002 8C10.5002 6.61929 9.38087 5.5 8.00016 5.5ZM6.50016 8C6.50016 7.17157 7.17174 6.5 8.00016 6.5C8.82859 6.5 9.50016 7.17157 9.50016 8C9.50016 8.82842 8.82859 9.5 8.00016 9.5C7.17174 9.5 6.50016 8.82842 6.50016 8Z" />
@@ -102,9 +110,10 @@ const SingleListItem = ({ item }: { item: Product }) => {
             <button
               onClick={() => handleItemToWishList()}
               className="flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 text-dark bg-white hover:text-blue transition-colors"
+              title="Add to Wishlist"
             >
               <svg className="fill-current" width="16" height="16" viewBox="0 0 16 16">
-                <path d="M3.74949 2.94946C2.6435 3.45502 1.83325 4.65749 1.83325 6.0914C1.83325 7.55633 2.43273 8.68549 3.29211 9.65318C4.0004 10.4507 4.85781 11.1118 5.694 11.7564C5.89261 11.9095 6.09002 12.0617 6.28395 12.2146C6.63464 12.491 6.94747 12.7337 7.24899 12.9099C7.55068 13.0862 7.79352 13.1667 7.99992 13.1667C8.20632 13.1667 8.44916 13.0862 8.75085 12.9099C9.05237 12.7337 9.3652 12.491 9.71589 12.2146C9.90982 12.0617 10.1072 11.9095 10.3058 11.7564C11.142 11.1118 11.9994 10.4507 12.7077 9.65318C13.5671 8.68549 14.1666 7.55633 14.1666 6.0914C14.1666 4.65749 13.3563 3.45502 12.2503 2.94946C11.1759 2.45832 9.73214 2.58839 8.36016 4.01382C8.2659 4.11175 8.13584 4.16709 7.99992 4.16709C7.864 4.16709 7.73393 4.11175 7.63967 4.01382C6.26769 2.58839 4.82396 2.45832 3.74949 2.94946ZM7.99992 2.97255C6.45855 1.5935 4.73256 1.40058 3.33376 2.03998C1.85639 2.71528 0.833252 4.28336 0.833252 6.0914C0.833252 7.86842 1.57358 9.22404 2.5444 10.3172C3.32183 11.1926 4.2734 11.9253 5.1138 12.5724C5.30431 12.7191 5.48911 12.8614 5.66486 12.9999C6.00636 13.2691 6.37295 13.5562 6.74447 13.7733C7.11582 13.9903 7.53965 14.1667 7.99992 14.1667C8.46018 14.1667 8.88401 13.9903 9.25537 13.7733C9.62689 13.5562 9.99348 13.2691 10.335 12.9999C10.5107 12.8614 10.6955 12.7191 10.886 12.5724C11.7264 11.9253 12.678 11.1926 13.4554 10.3172C14.4263 9.22404 15.1666 7.86842 15.1666 6.0914C15.1666 4.28336 14.1434 2.71528 12.6661 2.03998C11.2673 1.40058 9.54129 1.5935 7.99992 2.97255Z" />
+                <path d="M3.74949 2.94946C2.6435 3.45502 1.83325 4.65749 1.83325 6.0914C1.83325 7.55633 2.43273 8.68549 3.29211 9.65318C4.0004 10.4507 4.85781 11.1118 5.694 11.7564C5.89261 11.9095 6.09002 12.0617 6.28395 12.2146C6.63464 12.491 6.94747 12.7337 7.24899 12.9099C7.55068 13.0862 7.79352 13.1667 7.99992 13.1667C8.20632 13.1667 8.44916 13.0862 8.75085 12.9099C9.05237 12.7337 9.3652 12.491 9.71589 12.2146C9.90982 12.0617 10.1072 11.9095 10.3058 11.7564C11.142 11.1118 11.9994 10.4507 12.7077 9.65318C13.5671 8.68549 14.1666 7.55633 14.1666 6.0914C14.1666 4.65749 13.3563 3.45502 12.2503 2.94946C11.1759 2.45832 9.73214 2.58839 8.36016 4.01382C8.2659 4.11175 8.13584 4.16709 7.99992 4.16709C7.864 4.16709 7.73393 4.11175 7.63967 4.01382C6.26769 2.58839 4.82396 2.45832 3.74949 2.94946ZM7.99992 2.97255C6.45855 1.5935 4.73256 1.40058 3.33376 2.03998C1.85639 2.71528 0.833252 4.28336 0.833252 6.0914C0.833252 7.86842 1.57358 9.22404 2.5444 10.3172C3.32183 11.1926 4.2734 11.9253 5.1138 12.5724C5.30431 12.7191 5.48911 12.8614 5.66486 12.9999C6.00636 13.2691 6.37295 13.5562 6.74447 13.7733C7.11582 13.9903 7.53965 14.1667 7.99992 14.1667C8.46018 14.1667 8.88401 13.9903 9.25537 13.7733C9.62689 13.5562 9.99348 13.2691 10.335 12.9999C10.5107 12.8614 10.6955 12.7191 10.886 12.5724C11.7264 11.9253 12.678 11.1926 13.4554 10.3172C14.4263 9.22404 15.1666 7.86842 15.1668 6.0914C15.1666 4.28336 14.1434 2.71528 12.6661 2.03998C11.2673 1.40058 9.54129 1.5935 7.99992 2.97255Z" />
               </svg>
             </button>
           </div>
@@ -117,7 +126,6 @@ const SingleListItem = ({ item }: { item: Product }) => {
           </h3>
 
           <div className="flex items-center justify-between">
-            {/* ✅ Updated Price Section with Sale Logic */}
             <span className="flex items-center gap-2 font-medium text-lg">
               <span className="text-blue">
                 PKR {item.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
