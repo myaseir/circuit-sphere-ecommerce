@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   // ✅ Base URL for Social Media Images (Facebook/WhatsApp)
   metadataBase: new URL("https://www.glacialabs.com"), 
 
+  // ✅ GOOGLE VERIFICATION (Added Here)
+  verification: {
+    google: "TAMOlLE6pbk4jrdTqTnnUrA6151lR63gK_1xuB53f0k",
+  },
+
   // ✅ Updated Branding
   title: "Glacia Labs | Best Online Electronics & Robotics Store in Pakistan",
   description: "Shop Glacia Labs for Pakistan's #1 collection of Arduino, ESP32, Solar protection, SSDs, and IoT sensors. Fast nationwide shipping.",
@@ -23,7 +28,7 @@ export const metadata: Metadata = {
     siteName: "Glacia Labs",
     images: [
       {
-        url: "/images/logo/logo.png", // ⚠️ Ensure you update this image file to your new logo!
+        url: "/images/logo/logo.png", 
         width: 800,
         height: 600,
         alt: "Glacia Labs Logo",
