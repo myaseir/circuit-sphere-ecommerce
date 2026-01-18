@@ -1,9 +1,8 @@
-"use client";
-import React, { useState, useEffect, useCallback } from "react";
+"use client"; // Remove the word "check" if it was in your file
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Breadcrumb from "../Common/Breadcrumb";
 import SingleGridItem from "../Shop/SingleGridItem";
-
 import { Product } from "@/types/product";
 
 // --- HELPERS ---
@@ -24,7 +23,8 @@ const categories = [
   { name: "Prototyping Tools & Consumables" },
 ];
 
-const ShopWithSidebar = () => {
+// --- INNER COMPONENT (Contains Logic) ---
+const ShopContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -104,7 +104,7 @@ const ShopWithSidebar = () => {
 
           <div className="flex flex-col xl:flex-row gap-6">
             
-            {/* SIDEBAR - Slimmer Desktop Width (240px) */}
+            {/* SIDEBAR */}
             <aside className={`fixed top-0 left-0 h-full w-[85%] max-w-[340px] bg-white z-[10001] shadow-2xl transition-transform duration-500 ease-in-out xl:static xl:translate-x-0 xl:z-1 xl:w-[240px] xl:bg-transparent xl:shadow-none ${
               productSidebar ? "translate-x-0" : "-translate-x-full"
             }`}>
@@ -147,7 +147,7 @@ const ShopWithSidebar = () => {
               </div>
             </aside>
 
-            {/* MAIN CONTENT - Expands to fill the space */}
+            {/* MAIN CONTENT */}
             <div className="flex-1">
               <div className="bg-white rounded-2xl p-4 mb-8 flex items-center justify-between shadow-sm border border-gray-100">
                 <button 
@@ -194,6 +194,19 @@ const ShopWithSidebar = () => {
         </div>
       </section>
     </>
+  );
+};
+
+// --- MAIN PAGE COMPONENT (Exports the Suspense Boundary) ---
+const ShopWithSidebar = () => {
+  return (
+    <Suspense fallback={
+       <div className="flex justify-center items-center h-screen">
+          <div className="w-10 h-10 border-4 border-blue border-t-transparent rounded-full animate-spin"></div>
+       </div>
+    }>
+      <ShopContent />
+    </Suspense>
   );
 };
 
