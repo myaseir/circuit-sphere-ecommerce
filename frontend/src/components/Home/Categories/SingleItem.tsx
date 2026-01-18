@@ -3,11 +3,14 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+const convertToSlug = (text: string) => {
+  return text.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+};
+
 const SingleItem = ({ item }: { item: Category }) => {
   return (
     <Link 
-      // ✅ Using encodeURIComponent is vital for categories with "&" or spaces
-      href={`/shop-with-sidebar?category=${encodeURIComponent(item.title)}`} 
+      href={`/shop-with-sidebar?category=${convertToSlug(item.title)}`} 
       className="group flex flex-col items-center"
     >
       <div className="relative max-w-[130px] w-full h-32.5 rounded-full overflow-hidden flex items-center justify-center mb-4 border border-gray-100 shadow-sm bg-white">
@@ -15,8 +18,14 @@ const SingleItem = ({ item }: { item: Category }) => {
           src={item.img} 
           alt={item.title} 
           fill 
+          // ✅ FIX 1: Tell browser this image is never wider than 130px
+          sizes="(max-width: 768px) 100px, 130px" 
+          
           className="object-cover object-center transition-transform duration-500 group-hover:scale-110"
-          priority
+          
+          // ✅ FIX 2: Removed 'priority'. 
+          // Only add 'loading="eager"' if this component is literally at the very top of your homepage.
+          loading="lazy" 
         />
       </div>
 

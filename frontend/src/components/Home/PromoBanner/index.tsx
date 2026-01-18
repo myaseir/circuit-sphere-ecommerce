@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -40,6 +39,8 @@ const PromoBanner = () => {
                 alt="Smart WiFi Water Tank Automation Kit"
                 width={320}
                 height={320}
+                // ✅ ADDED SIZES: Critical for mobile performance
+                sizes="(max-width: 768px) 100vw, 320px"
                 className="object-contain hover:scale-105 transition-transform duration-500 w-[240px] lg:w-[320px]"
              />
           </div>
@@ -48,42 +49,44 @@ const PromoBanner = () => {
         <div className="grid gap-7.5 grid-cols-1 lg:grid-cols-2">
           
           {/* ================= SMALL BANNER 1 (Arduino) ================= */}
-          {/* ================= SMALL BANNER 1 (Arduino) ================= */}
-<div className="relative z-1 overflow-hidden rounded-lg bg-[#E0F7FA] py-10 lg:py-16 px-6 lg:px-10 flex flex-col lg:flex-row items-center">
-  
-  {/* Text Content: Centered on mobile, Right-aligned on desktop */}
-  <div className="w-full lg:text-right lg:ml-auto lg:max-w-[240px] text-center z-10">
-    <span className="block text-base lg:text-lg text-dark mb-1.5">
-      For Beginners
-    </span>
+          <div className="relative z-1 overflow-hidden rounded-lg bg-[#E0F7FA] py-10 lg:py-16 px-6 lg:px-10 flex flex-col lg:flex-row items-center">
+            
+            {/* Text Content */}
+            <div className="w-full lg:text-right lg:ml-auto lg:max-w-[240px] text-center z-10">
+              <span className="block text-base lg:text-lg text-dark mb-1.5">
+                For Beginners
+              </span>
 
-    <h2 className="font-bold text-xl lg:text-heading-4 text-dark mb-2.5">
-      Start Robotics
-    </h2>
+              <h2 className="font-bold text-xl lg:text-heading-4 text-dark mb-2.5">
+                Start Robotics
+              </h2>
 
-    <p className="font-semibold text-custom-1 text-teal-600">
-      Arduino Uno R3 <br/> Flat 20% off
-    </p>
+              <p className="font-semibold text-custom-1 text-teal-700">
+                Arduino Uno R3 <br/> Flat 20% off
+              </p>
 
-    <Link
-      href="/shop/arduino"
-      className="inline-flex font-medium text-custom-sm text-dark bg-teal-600 py-2.5 px-8.5 rounded-md ease-out duration-200 hover:bg-teal-800 mt-6 lg:mt-9"
-    >
-      Grab Now
-    </Link>
-  </div>
+              <Link
+                href="/shop/arduino"
+                // ✅ FIXED: Changed text color to white for better contrast
+                className="inline-flex font-medium text-custom-sm text-white bg-teal-600 py-2.5 px-8.5 rounded-md ease-out duration-200 hover:bg-teal-800 mt-6 lg:mt-9"
+              >
+                Grab Now
+              </Link>
+            </div>
 
-  {/* Image: Bottom-centered on mobile, Left-aligned on desktop */}
-  <div className="relative mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-3 xl:left-6 lg:z-[-1]">
-     <Image
-        src="https://res.cloudinary.com/dxxqrjnje/image/upload/v1768489890/electronic_kits/hb8rk8hifj33h1gseray.png"
-        alt="Arduino Uno R3"
-        width={180}
-        height={180}
-        className="object-contain hover:rotate-3 transition-transform duration-500 w-[140px] lg:w-[180px] mx-auto"
-     />
-  </div>
-</div>
+            {/* Image */}
+            <div className="relative mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-3 xl:left-6 lg:z-[-1]">
+               <Image
+                  src="https://res.cloudinary.com/dxxqrjnje/image/upload/v1768489890/electronic_kits/hb8rk8hifj33h1gseray.png"
+                  alt="Arduino Uno R3"
+                  width={180}
+                  height={180}
+                  // ✅ ADDED SIZES
+                  sizes="(max-width: 768px) 100vw, 180px"
+                  className="object-contain hover:rotate-3 transition-transform duration-500 w-[140px] lg:w-[180px] mx-auto"
+               />
+            </div>
+          </div>
 
           {/* ================= SMALL BANNER 2 (ESP32) ================= */}
           <div className="relative z-1 overflow-hidden rounded-lg bg-[#FFECE1] py-10 lg:py-16 px-6 lg:px-10 flex flex-col lg:flex-row items-center justify-between text-center lg:text-left">
@@ -104,9 +107,10 @@ const PromoBanner = () => {
                 Save 15% Today
               </span>
 
+              {/* ✅ FIXED: Changed external Render URL to internal relative path */}
               <Link
-                href="https://circuit-sphere-ecommerce.onrender.com/shop/69599364f412c4afb08b8632"
-                className="inline-flex font-medium text-custom-sm text-dark bg-orange-500 py-2.5 px-8.5 rounded-md ease-out duration-200 hover:bg-orange-700"
+                href="/shop/69599364f412c4afb08b8632"
+                className="inline-flex font-medium text-custom-sm text-white bg-orange-500 py-2.5 px-8.5 rounded-md ease-out duration-200 hover:bg-orange-600"
               >
                 Buy Now
               </Link>
@@ -118,6 +122,8 @@ const PromoBanner = () => {
                   alt="ESP32 NodeMCU"
                   width={160}
                   height={160}
+                  // ✅ ADDED SIZES
+                  sizes="(max-width: 768px) 100vw, 160px"
                   className="object-contain hover:scale-110 transition-transform duration-500 w-[140px] lg:w-[160px]"
                />
             </div>

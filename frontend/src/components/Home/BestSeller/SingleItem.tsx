@@ -10,11 +10,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { addItemToWishlist } from "@/redux/features/wishlist-slice";
 
-const SingleItem = ({ item }: { item: Product }) => {
+// ✅ 1. Add 'priority' to the props definition
+interface SingleItemProps {
+  item: Product;
+  priority?: boolean; 
+}
+
+const SingleItem = ({ item, priority = false }: SingleItemProps) => {
   const { openModal } = useModalContext();
   const dispatch = useDispatch<AppDispatch>();
 
-  // ✅ IMPROVED: Unbox image URL safely
   const displayImage = Array.isArray(item.image) 
     ? item.image[0] 
     : (item.image || "/images/product/product-01.png");
@@ -38,7 +43,6 @@ const SingleItem = ({ item }: { item: Product }) => {
     <div className="group">
       <div className="relative overflow-hidden rounded-lg bg-[#F6F7FB] min-h-[403px] flex flex-col justify-between">
         
-        {/* Badge for Out of Stock */}
         {isOutOfStock && (
           <span className="absolute top-4 left-4 z-10 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase">
             Out of Stock
@@ -67,13 +71,14 @@ const SingleItem = ({ item }: { item: Product }) => {
           </span>
         </div>
 
-        {/* Product Image */}
+        {/* ✅ 2. Use the priority prop here */}
         <div className="flex justify-center items-center pb-8">
           <Image 
             src={displayImage} 
             alt={item.title} 
             width={240} 
             height={240}
+            priority={priority} // <--- Critical for LCP Score
             className={`object-contain h-[220px] transition-transform duration-500 group-hover:scale-110 ${isOutOfStock ? 'opacity-50 grayscale' : ''}`}
           />
         </div>
@@ -85,7 +90,7 @@ const SingleItem = ({ item }: { item: Product }) => {
             className="flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 text-dark bg-white hover:text-white hover:bg-blue"
             title="Quick View"
           >
-            {/* SVG Eye Icon */}
+            {/* PASTE YOUR FULL SVG HERE */}
             <svg className="fill-current" width="16" height="16" viewBox="0 0 16 16"><path d="M7.99992 5.49996C6.61921 5.49996 5.49992 6.61925 5.49992 7.99996..." /></svg>
           </button>
 
@@ -95,7 +100,7 @@ const SingleItem = ({ item }: { item: Product }) => {
             className={`flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 transition-all ${isOutOfStock ? 'bg-gray-300 cursor-not-allowed' : 'bg-white hover:text-white hover:bg-blue text-dark'}`}
             title={isOutOfStock ? "Out of Stock" : "Add to Cart"}
           >
-            {/* SVG Cart Icon */}
+             {/* PASTE YOUR FULL SVG HERE */}
             <svg className="fill-current" width="16" height="16" viewBox="0 0 16 16"><path d="M1.4915 1.52567C1.22953 1.43835 0.94637 1.57993 0.859046 1.8419..." /></svg>
           </button>
 
@@ -104,7 +109,7 @@ const SingleItem = ({ item }: { item: Product }) => {
             className="flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 text-dark bg-white hover:text-white hover:bg-blue"
             title="Add to Wishlist"
           >
-            {/* SVG Heart Icon */}
+             {/* PASTE YOUR FULL SVG HERE */}
             <svg className="fill-current" width="16" height="16" viewBox="0 0 16 16"><path d="M3.74949 2.94946C2.6435 3.45502 1.83325 4.65749 1.83325 6.0914..." /></svg>
           </button>
         </div>

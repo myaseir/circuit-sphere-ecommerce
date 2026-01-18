@@ -3,27 +3,31 @@ import HeroCarousel from "./HeroCarousel";
 import HeroFeature from "./HeroFeature";
 import Image from "next/image";
 import Link from "next/link";
+
 const Hero = () => {
   return (
     <section className="overflow-hidden pb-10 lg:pb-12.5 xl:pb-15 pt-57.5 sm:pt-45 lg:pt-30 xl:pt-51.5 bg-[#E5EAF4]">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
         <div className="flex flex-wrap gap-5">
+          
+          {/* ================= LEFT SIDE: MAIN CAROUSEL ================= */}
           <div className="xl:max-w-[757px] w-full">
             <div className="relative z-1 rounded-[10px] bg-white overflow-hidden">
-              {/* <!-- bg shapes --> */}
+              {/* Bg shapes - Decorative, can be lazy loaded */}
               <Image
                 src="/images/hero/hero-bg.png"
                 alt="hero bg shapes"
                 className="absolute right-0 bottom-0 -z-1"
                 width={534}
                 height={520}
+                loading="lazy"
               />
-
               <HeroCarousel />
             </div>
           </div>
 
-       <div className="xl:max-w-[393px] w-full">
+          {/* ================= RIGHT SIDE: PROMO PRODUCTS ================= */}
+          <div className="xl:max-w-[393px] w-full">
             <div className="flex flex-col sm:flex-row xl:flex-col gap-5">
               
               {/* Product 1: Smart WiFi Water Tank Automation Kit */}
@@ -31,7 +35,7 @@ const Hero = () => {
                 <div className="flex items-center gap-14">
                   <div>
                     <h2 className="max-w-[193px] font-semibold text-dark text-xl mb-20">
-                      <Link href="/shop/kits/water-tank-automation">
+                      <Link href="/shop/kits/water-tank-automation" className="hover:text-blue transition-colors">
                         Smart WiFi Water Tank Automation Kit
                       </Link>
                     </h2>
@@ -57,6 +61,8 @@ const Hero = () => {
                       alt="Smart WiFi Water Tank Automation Kit"
                       width={173}
                       height={181}
+                      // ✅ ADDED SIZES: Tells browser this image is small (approx 173px)
+                      sizes="(max-width: 768px) 150px, 173px"
                       className="object-contain"
                     />
                   </div>
@@ -68,7 +74,8 @@ const Hero = () => {
                 <div className="flex items-center gap-14">
                   <div>
                     <h2 className="max-w-[153px] font-semibold text-dark text-xl mb-20">
-                      <Link href="https://circuit-sphere-ecommerce.onrender.com/shop/69599364f412c4afb08b8632">
+                      {/* ✅ FIXED: Changed external render link to internal relative link */}
+                      <Link href="/shop/69599364f412c4afb08b8632" className="hover:text-blue transition-colors">
                         SG90 Servo
                       </Link>
                     </h2>
@@ -77,14 +84,13 @@ const Hero = () => {
                       <p className="font-medium text-dark-4 text-custom-sm mb-1.5">
                         Best Seller
                       </p>
-                      <span className="flex items-center gap-0">
+                      <span className="flex items-center gap-3">
                         <span className="font-medium text-heading-6 text-blue">
                           PKR 350
                         </span>
-                         <span className="font-medium text-s text-dark-4 line-through">
+                        <span className="font-medium text-s text-dark-4 line-through">
                           PKR 500
                         </span>
-                       
                       </span>
                     </div>
                   </div>
@@ -95,6 +101,8 @@ const Hero = () => {
                       alt="SG90 Micro Servo Motor"
                       width={223}
                       height={261}
+                      // ✅ ADDED SIZES: Tells browser this image is small
+                      sizes="(max-width: 768px) 150px, 223px"
                       className="object-contain"
                     />
                   </div>
@@ -106,7 +114,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* <!-- Hero features --> */}
+      {/* Hero features (Free Shipping, etc) */}
       <HeroFeature />
     </section>
   );

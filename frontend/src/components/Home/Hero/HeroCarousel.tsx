@@ -24,7 +24,7 @@ const HeroCarousal = () => {
       modules={[Autoplay, Pagination]}
       className="hero-carousel"
     >
-      {/* ================= SLIDE 1: FOCUS ON CONNECTIVITY ================= */}
+      {/* ================= SLIDE 1 ================= */}
       <SwiperSlide>
         <div className="flex items-center pt-6 sm:pt-0 flex-col-reverse sm:flex-row">
           <div className="max-w-[394px] py-10 sm:py-15 lg:py-24.5 pl-4 sm:pl-7.5 lg:pl-12.5">
@@ -39,7 +39,6 @@ const HeroCarousal = () => {
               </span>
             </div>
 
-            {/* H1: Primary Keyword Focus */}
             <h1 className="font-semibold text-dark text-xl sm:text-3xl mb-3">
               <Link href="/shop/esp32">
                 ESP32 NodeMCU (WiFi + Bluetooth)
@@ -48,7 +47,7 @@ const HeroCarousal = () => {
 
             <p className="text-gray-600 leading-relaxed">
               The ultimate IoT solution for your FYP. Features dual-mode WiFi and Bluetooth 
-              connectivity, making it perfect for Smart Home automation and remote control projects.
+              connectivity, making it perfect for Smart Home automation.
             </p>
 
             <Link
@@ -59,20 +58,24 @@ const HeroCarousal = () => {
             </Link>
           </div>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center relative">
             <Image
               src="https://res.cloudinary.com/dxxqrjnje/image/upload/v1768490079/electronic_kits/m7vxszetvuxresgcakz8.png"
               alt="ESP32 NodeMCU WiFi Bluetooth Board Pakistan"
               width={351}
               height={358}
-              priority
+              priority={true} // ✅ CORRECT: Loads instantly for LCP
+              
+              // ✅ ADDED: Tells browser "on mobile use small img, on desktop use ~351px"
+              sizes="(max-width: 640px) 90vw, 351px" 
+              
               className="object-contain"
             />
           </div>
         </div>
       </SwiperSlide>
 
-      {/* ================= SLIDE 2: FOCUS ON PERFORMANCE ================= */}
+      {/* ================= SLIDE 2 ================= */}
       <SwiperSlide>
         <div className="flex items-center pt-6 sm:pt-0 flex-col-reverse sm:flex-row">
           <div className="max-w-[394px] py-10 sm:py-15 lg:py-26 pl-4 sm:pl-7.5 lg:pl-12.5">
@@ -87,7 +90,6 @@ const HeroCarousal = () => {
               </span>
             </div>
 
-            {/* H2: Secondary Feature Focus */}
             <h2 className="font-semibold text-dark text-xl sm:text-3xl mb-3">
               <Link href="/shop/esp32">
                 Dual-Core Power & Arduino Compatible
@@ -96,24 +98,29 @@ const HeroCarousal = () => {
 
             <p className="text-gray-600 leading-relaxed">
               Experience blazing fast processing speed with the ESP32 Dual Core chip. 
-              Fully compatible with Arduino IDE, MicroPython, and Lua. Low power consumption guaranteed.
+              Fully compatible with Arduino IDE, MicroPython, and Lua.
             </p>
 
+            {/* ✅ FIXED: Changed external render link to internal relative link */}
             <Link
-              href="https://circuit-sphere-ecommerce.onrender.com/shop/69599364f412c4afb08b8632"
+              href="/shop/69599364f412c4afb08b8632" 
               className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10"
             >
               Buy Now
             </Link>
           </div>
 
-          <div className="flex justify-center">
-             {/* Second Image URL */}
+          <div className="flex justify-center relative">
             <Image
               src="https://res.cloudinary.com/dxxqrjnje/image/upload/v1768489890/electronic_kits/hb8rk8hifj33h1gseray.png"
               alt="ESP32 Development Board Pinout and Features"
               width={361}
               height={368}
+              // ❌ priority removed (Correct: Slide 2 should lazy load)
+              
+              // ✅ ADDED: Consistent sizing
+              sizes="(max-width: 640px) 90vw, 361px"
+              
               className="object-contain"
             />
           </div>
