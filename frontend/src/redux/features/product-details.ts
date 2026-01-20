@@ -7,19 +7,18 @@ type InitialState = {
 
 const initialState: InitialState = {
   value: {
-    id: 0,
+    id: "", // ✅ FIXED: Changed from 0 to "" to match string type
     title: "",
     price: 0,
     reviews: 0,
     discountedPrice: 0,
-    image: [],          // Matches image: string[] in your type
-    img: "",            // Matches img?: string in your type
+    image: [],          // Matches image: string[]
+    img: "",            // Matches img?: string
     imgs: { 
       thumbnails: [], 
       previews: [] 
     },
-    specImages: [],     // Matches specImages?: string[] in your type
-    // Note: 'images' was removed because it is not in your Product type
+    specImages: [],     // Matches specImages?: string[]
   },
 };
 
