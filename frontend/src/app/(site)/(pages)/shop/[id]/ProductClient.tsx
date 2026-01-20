@@ -6,6 +6,8 @@ import Breadcrumb from "@/components/Common/Breadcrumb";
 import { useDispatch } from "react-redux";
 import { addItemToCart } from "@/redux/features/cart-slice";
 import RelatedProducts from "./RelatedProducts";
+import ReviewsSection from "@/components/Shop/ReviewsSection";
+import { StarIcon } from "@heroicons/react/20/solid"; 
 
 interface ProductClientProps {
   id: string;
@@ -23,16 +25,15 @@ const ProductClient = ({ id }: ProductClientProps) => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    
-    const response = await fetch(`${baseUrl}/api/v1/kits/${id}`);
-    
-    if (!response.ok) return { title: "Product Not Found | Circuit Sphere" };
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        
+        const response = await fetch(`${baseUrl}/api/v1/kits/${id}`);
+        
+        if (!response.ok) return; 
         
         const item = await response.json();
 
-        // ✅ FIX: Cache-Busting for Cloudinary Images
-        // Adding a timestamp prevents the browser from showing "old" or "broken" cache
+        // Cache-Busting
         const timestamp = Date.now();
         const addVersion = (url: string) => 
           url.includes("cloudinary.com") ? `${url}?v=${timestamp}` : url;
@@ -59,11 +60,13 @@ const ProductClient = ({ id }: ProductClientProps) => {
           category: item.category || "Electronics",
           stock: Number(item.stock_quantity),
           description: item.description,
-          reviews: 50,
+          
+          reviews: item.total_reviews || 0,
+          rating: item.average_rating || 0,
+          
           originalPrice: item.original_price ? Number(item.original_price) : 0,
           isOnSale: Boolean(item.on_sale),
           specifications: processedSpecs,
-          // ✅ Apply Cache-Busting to Spec Images as well
           specImages: (item.spec_images || []).map(addVersion)
         };
 
@@ -170,6 +173,15 @@ const ProductClient = ({ id }: ProductClientProps) => {
                   </span>
                 )}
 
+                {/* ✅ FIXED: RATING BADGE WITH HEX COLOR */}
+                {(product.rating && product.rating > 0) ? (
+                   <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-md border border-yellow-100">
+                      <StarIcon className="h-4 w-4 text-[#FBBF24]" /> {/* ✅ Forced Gold Color */}
+                      <span className="text-sm font-bold text-gray-700">{product.rating.toFixed(1)}</span>
+                      <span className="text-xs text-gray-500">({product.reviews} reviews)</span>
+                   </div>
+                ) : null}
+
                 <span className={`ml-auto px-3 py-1 rounded-full text-[10px] lg:text-xs font-bold border uppercase tracking-wider
                   ${(product.stock && product.stock > 0) 
                     ? "text-green-600 bg-green-50 border-green-100" 
@@ -232,7 +244,7 @@ const ProductClient = ({ id }: ProductClientProps) => {
                   </div>
                 )}
 
-                {/* Part B: Long Visual Datasheet (Optimized for 956x2671) */}
+                {/* Part B: Long Visual Datasheet */}
                 {product.specImages && product.specImages.length > 0 && (
                   <div className="w-full max-w-[956px] mx-auto">
                     <h3 className="text-sm lg:text-base font-bold text-gray-400 mb-4 uppercase tracking-widest">Technical Datasheet</h3>
@@ -253,6 +265,9 @@ const ProductClient = ({ id }: ProductClientProps) => {
               </div>
             </div>
           )}
+
+          <ReviewsSection productId={product.id} />
+          
         </div>
       </section>
       

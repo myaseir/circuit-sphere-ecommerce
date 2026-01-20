@@ -2,15 +2,16 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/types/product";
-import SingleGridItem from "../../Shop/SingleGridItem";
+import SingleGridItem from "@/components/Shop/SingleGridItem";
 
-// 1. Define Fetch Logic outside the component (or in a separate utility file)
+// 1. Define Fetch Logic outside the component
 async function getBestSellers() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    
     // Add "no-store" or "revalidate" to control caching
     const response = await fetch(`${baseUrl}/api/v1/kits?limit=6`, {
-      next: { revalidate: 3600 } // Re-fetch data every 1 hour
+      next: { revalidate: 60 }// Re-fetch data every 1 hour
     });
 
     if (!response.ok) return [];
@@ -33,11 +34,14 @@ async function getBestSellers() {
         price: item.price,
         discountedPrice: item.price,
         image: [finalImage],
-        reviews: 50,
         category: item.category,
         stock: item.stock_quantity,
         originalPrice: item.original_price,
         isOnSale: item.on_sale,
+        
+        // ✅ CRITICAL FIX: Map real rating data
+        rating: item.average_rating || 0,
+        reviews: item.total_reviews || 0,
       };
     }) as Product[];
   } catch (error) {
@@ -71,7 +75,7 @@ const BestSeller = async () => {
           </div>
         </div>
 
-        {/* 3. Direct Rendering (No Loading State needed) */}
+        {/* 3. Direct Rendering */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7.5">
           {products.length > 0 ? (
             products.map((item, key) => (

@@ -1,34 +1,29 @@
 export type Product = {
-  id: string | number; 
+  id: string;
   title: string;
   price: number;
+  image: string[];
   
-  // Optional fields for safety
+  // ✅ Front-end standard keys
+  rating?: number;
   reviews?: number;
+
+  // ✅ BACKEND API KEYS (Add these to fix the missing data)
+  average_rating?: number;
+  total_reviews?: number;
+
   discountedPrice?: number;
-  
-  // ✅ API STANDARD: Array of images
-  image: string[]; 
-
-  // ✅ UI FALLBACK: To prevent existing components from crashing
-  // Use this in your components as: src={product.img || product.image[0]}
-  img?: string; 
-
+  img?: string;
   category?: string;
   stock?: number;
-  description?: string; 
-
-  // ⚠️ BACKWARD COMPATIBILITY
+  description?: string;
+  originalPrice?: number;
+  isOnSale?: boolean;
+  specifications?: Record<string, string>;
+  specImages?: string[];
+  
   imgs?: {
     thumbnails: string[];
     previews: string[];
   };
-
-  // ----------------------------------------
-  // ✅ NEW FIELDS FOR SALE & SPECIFICATIONS
-  // ----------------------------------------
-  originalPrice?: number;                
-  isOnSale?: boolean;                    
-  specifications?: Record<string, string>; 
-  specImages?: string[];                 
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Product } from "@/types/product";
-import SingleGridItem from "../../Shop/SingleGridItem";
+import SingleGridItem from "@/components/Shop/SingleGridItem";
 
 // 1. Fetch Logic (Server Side)
 async function getNewArrivals() {
@@ -10,7 +10,7 @@ async function getNewArrivals() {
     
     // Fetch latest 8 items with caching (1 hour)
     const response = await fetch(`${baseUrl}/api/v1/kits?limit=8`, {
-      next: { revalidate: 3600 } 
+     next: { revalidate: 60 }
     });
 
     if (!response.ok) return [];
@@ -33,11 +33,14 @@ async function getNewArrivals() {
         price: item.price,
         discountedPrice: item.price,
         image: [finalImage],
-        reviews: 50,
         category: item.category,
         stock: item.stock_quantity,
         originalPrice: item.original_price,
         isOnSale: item.on_sale,
+        
+        // ✅ CRITICAL FIX: Map real rating data
+        rating: item.average_rating || 0,
+        reviews: item.total_reviews || 0,
       };
     }) as Product[];
   } catch (error) {
@@ -83,7 +86,6 @@ const NewArrival = async () => {
               <SingleGridItem 
                 key={item.id || key} 
                 item={item} 
-                // ✅ REMOVED 'priority' prop to avoid TS error
               />
             ))
           ) : (

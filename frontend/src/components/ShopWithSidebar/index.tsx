@@ -1,8 +1,10 @@
-"use client"; // Remove the word "check" if it was in your file
+"use client"; 
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Breadcrumb from "../Common/Breadcrumb";
 import SingleGridItem from "../Shop/SingleGridItem";
+// ✅ IMPORT LIST ITEM (Ensure this file exists in your folder structure)
+import SingleListItem from "@/components/Shop/SingleListItem"; 
 import { Product } from "@/types/product";
 
 // --- HELPERS ---
@@ -61,6 +63,10 @@ const ShopContent = () => {
         stock: item.stock_quantity,
         originalPrice: item.original_price,
         isOnSale: item.on_sale,
+        
+        // ✅ CRITICAL FIX: Map the Rating Data from API
+        rating: item.average_rating || 0,
+        reviews: item.total_reviews || 0,
       })));
     } catch (error) {
       console.error("Fetch failed:", error);
@@ -180,7 +186,12 @@ const ShopContent = () => {
                 <div className={productStyle === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
                   {products.length > 0 ? (
                     products.map((item, i) => (
-                      <SingleGridItem key={item.id || i} item={item} />
+                      // ✅ CONDITIONAL RENDERING: GRID vs LIST
+                      productStyle === "grid" ? (
+                         <SingleGridItem key={item.id || i} item={item} />
+                      ) : (
+                         <SingleListItem key={item.id || i} item={item} />
+                      )
                     ))
                   ) : (
                     <div className="col-span-full py-20 text-center bg-white rounded-2xl border-2 border-dashed border-gray-100">

@@ -9,16 +9,19 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import Link from "next/link";
 import Image from "next/image";
+import { StarIcon } from "@heroicons/react/20/solid"; 
 
-// ✅ 1. Update Interface to accept 'priority'
 interface SingleGridItemProps {
   item: Product;
-  priority?: boolean; // Optional prop
+  priority?: boolean;
 }
 
 const SingleGridItem = ({ item, priority = false }: SingleGridItemProps) => {
   const { openModal } = useModalContext();
   const dispatch = useDispatch<AppDispatch>();
+
+  const starRating = item.rating || item.average_rating || 0;
+  const reviewCount = item.reviews || item.total_reviews || 0;
 
   const getImageUrl = () => {
     const placeholder = "/images/product/product-01.png";
@@ -42,7 +45,6 @@ const SingleGridItem = ({ item, priority = false }: SingleGridItemProps) => {
     dispatch(addItemToWishlist({ ...item, status: "available", quantity: 1 }));
   };
 
-  // SMART PRICE LOGIC
   const effectivePrice = (!item.isOnSale && item.originalPrice) 
       ? item.originalPrice 
       : item.price;
@@ -60,8 +62,7 @@ const SingleGridItem = ({ item, priority = false }: SingleGridItemProps) => {
   return (
     <div className="group">
       <div className="relative overflow-hidden flex items-center justify-center rounded-lg bg-white shadow-1 min-h-[270px] mb-4 border border-gray-2">
-        
-        {/* Discount Badge */}
+        {/* ... Image Code ... */}
         {isSaleActive && (
           <span className="absolute top-3 left-3 z-10 inline-flex items-center justify-center rounded-md bg-red-600 px-2.5 py-1 text-xs font-bold text-white uppercase shadow-sm animate-pulse">
             -{discountPercentage}%
@@ -74,10 +75,8 @@ const SingleGridItem = ({ item, priority = false }: SingleGridItemProps) => {
               src={getImageUrl()}
               alt={item.title || "Product Image"}
               fill
-              // ✅ 2. Pass the priority prop here
               priority={priority} 
               className="object-contain transition-transform duration-300 group-hover:scale-110" 
-              // Optimization: On mobile grids (usually 2 columns), 50vw is more accurate than 100vw
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 250px"
             />
           </div>
@@ -102,6 +101,23 @@ const SingleGridItem = ({ item, priority = false }: SingleGridItemProps) => {
       <h3 className="font-medium text-dark mb-1.5 transition-colors hover:text-blue line-clamp-1">
         <Link href={`/shop/${item.id}`}>{item.title}</Link>
       </h3>
+
+      {/* ✅ FIXED: Always show stars (removed starRating > 0 check) */}
+      <div className="flex items-center gap-1 mb-2">
+          <div className="flex">
+            {[...Array(5)].map((_, i) => (
+              <StarIcon 
+                key={i} 
+                className={`h-4 w-4 fill-current ${
+                  i < Math.round(starRating) ? "text-[#FBBF24]" : "text-gray-300"
+                }`} 
+              />
+            ))}
+          </div>
+          <span className="text-xs text-gray-500 font-medium">
+            {starRating.toFixed(1)}({reviewCount} reviews)
+          </span>
+      </div>
 
       <span className="flex items-center gap-2 font-medium text-lg">
         <span className="text-blue">

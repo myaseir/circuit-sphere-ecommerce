@@ -1,7 +1,8 @@
 "use client";
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import SingleGridItem from "../Shop/SingleGridItem";
+import SingleListItem from "@/components/Shop/SingleListItem"; // ✅ IMPORT THIS
 import { Product } from "@/types/product";
 
 const ShopWithoutSidebar = () => {
@@ -17,7 +18,6 @@ const ShopWithoutSidebar = () => {
       const skip = (page - 1) * limit;
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-      // ✅ REMOVED "&category=Laptops" to fetch everything
       const response = await fetch(
         `${baseUrl}/api/v1/kits?skip=${skip}&limit=${limit}`
       );
@@ -39,11 +39,14 @@ const ShopWithoutSidebar = () => {
           price: item.price,
           discountedPrice: item.price,
           image: [safeImage], 
-          reviews: 50, 
           category: item.category,
           stock: item.stock_quantity,
           originalPrice: item.original_price, 
           isOnSale: item.on_sale,
+          
+          // ✅ FIX: Map real rating data from API
+          rating: item.average_rating || 0,
+          reviews: item.total_reviews || 0,
         };
       });
 
@@ -93,7 +96,12 @@ const ShopWithoutSidebar = () => {
             <div className={productStyle === "grid" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8" : "flex flex-col gap-6"}>
               {products.length > 0 ? (
                 products.map((item, i) => (
-                  <SingleGridItem key={item.id || i} item={item} />
+                  // ✅ FIX: Switch between Grid and List components
+                  productStyle === "grid" ? (
+                    <SingleGridItem key={item.id || i} item={item} />
+                  ) : (
+                    <SingleListItem key={item.id || i} item={item} />
+                  )
                 ))
               ) : (
                 <div className="col-span-full py-20 text-center">
