@@ -7,15 +7,19 @@ type InitialState = {
 
 const initialState: InitialState = {
   value: {
-    id: 0, // Can be string or number now
+    id: "", // ✅ FIXED: Initialize as string to match Product type
     title: "",
     price: 0,
     reviews: 0,
+    rating: 0, // ✅ ADDED: Initialize rating to prevent UI errors
     discountedPrice: 0,
     category: "",
     stock: 0,
+    description: "", // ✅ ADDED: Usually required for Quick View
+    isOnSale: false, // ✅ ADDED: Good practice to initialize
+    originalPrice: 0,
     
-    // ✅ Initial state for the new image field
+    // ✅ Initial state for the image field
     image: [], 
     
     // Backwards compatibility
@@ -27,7 +31,6 @@ export const quickView = createSlice({
   name: "quickView",
   initialState,
   reducers: {
-    // ✅ Typed the action payload correctly
     updateQuickView: (state, action: PayloadAction<Product>) => {
       state.value = action.payload;
     },
