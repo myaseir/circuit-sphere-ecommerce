@@ -38,7 +38,7 @@ const Hero = () => {
                 <div className="flex items-center gap-14">
                   <div>
                     <h2 className="max-w-[193px] font-semibold text-dark text-xl mb-20">
-                      <Link href="/shop/kits/water-tank-automation" className="hover:text-blue transition-colors">
+                      <Link href="shop-with-sidebar" className="hover:text-blue transition-colors">
                         Smart WiFi Water Tank Automation Kit
                       </Link>
                     </h2>
@@ -76,7 +76,7 @@ const Hero = () => {
                 <div className="flex items-center gap-14">
                   <div>
                     <h2 className="max-w-[153px] font-semibold text-dark text-xl mb-20">
-                      <Link href="/shop/69599364f412c4afb08b8632" className="hover:text-blue transition-colors">
+                      <Link href="shop-with-sidebar" className="hover:text-blue transition-colors">
                         SG90 Servo
                       </Link>
                     </h2>

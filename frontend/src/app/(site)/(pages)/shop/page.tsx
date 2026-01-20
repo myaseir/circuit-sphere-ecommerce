@@ -5,7 +5,6 @@ import { useSearchParams } from "next/navigation";
 import Breadcrumb from "@/components/Common/Breadcrumb";
 import { Product } from "@/types/product";
 import Link from "next/link";
-// ✅ Import the component we fixed earlier
 import SingleGridItem from "@/components/Shop/SingleGridItem"; 
 
 const ShopContent = () => {
@@ -32,12 +31,12 @@ const ShopContent = () => {
   useEffect(() => {
     const fetchFilteredProducts = async () => {
       try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-setLoading(true);
-const response = await fetch(`${baseUrl}/api/v1/kits`);
-if (!response.ok) throw new Error("Failed to fetch products");
-const data = await response.json();
+        setLoading(true);
+        const response = await fetch(`${baseUrl}/api/v1/kits`);
+        if (!response.ok) throw new Error("Failed to fetch products");
+        const data = await response.json();
 
         const targetCategoryName = categoryMap[categoryId]?.toLowerCase();
 
@@ -52,7 +51,7 @@ const data = await response.json();
           return matchesSearch && matchesCategory;
         });
 
-        // 2. MAPPING (Updated to include Sale Info)
+        // 2. MAPPING (Updated to include Reviews & Ratings)
         const mappedData: Product[] = filtered.map((item: any) => {
           let safeImage = "/images/product/product-01.png";
           
@@ -70,11 +69,17 @@ const data = await response.json();
             image: [safeImage], 
             category: item.category || "General",
             stock: item.stock_quantity || 0,
-            reviews: 0,
             
-            // ✅ CRITICAL FIX: Mapping the Sale Data here!
-            originalPrice: item.original_price, // Backend (snake_case) -> Frontend (camelCase)
-            isOnSale: item.on_sale,             // Backend (snake_case) -> Frontend (camelCase)
+            // ✅ CRITICAL FIX: Map Reviews and Ratings correctly
+            // Backend sends 'total_reviews', frontend expects 'reviews'
+            reviews: item.total_reviews || 0,
+            
+            // Backend sends 'average_rating', frontend expects 'rating'
+            rating: item.average_rating || 0,
+            
+            // Mapping Sale Data
+            originalPrice: item.original_price, 
+            isOnSale: item.on_sale,             
           };
         });
 
@@ -104,8 +109,6 @@ const data = await response.json();
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.length > 0 ? (
             products.map((product) => (
-              // ✅ FIX: Use the Component! Do not hardcode HTML here.
-              // This component contains the Red Badge & Strikethrough logic.
               <SingleGridItem key={product.id} item={product} />
             ))
           ) : (

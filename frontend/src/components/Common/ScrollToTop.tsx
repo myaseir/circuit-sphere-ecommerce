@@ -1,20 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function ScrollToTop() {
   const [isVisible, setIsVisible] = useState(false);
+  const pathname = usePathname(); // ✅ Detects route changes
 
-  // Top: 0 takes us all the way back to the top of the page
-  // Behavior: smooth keeps it smooth!
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
+  // 1. FIX: Instantly scroll to top on every page navigation
   useEffect(() => {
-    // Button is displayed after scrolling for 500 pixels
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  // 2. EXISTING FEATURE: Toggle "Back to Top" button visibility
+  useEffect(() => {
     const toggleVisibility = () => {
       if (window.pageYOffset > 300) {
         setIsVisible(true);
@@ -24,15 +22,23 @@ export default function ScrollToTop() {
     };
 
     window.addEventListener("scroll", toggleVisibility);
-
     return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
+
+  // 3. Helper to scroll smooth when clicking the button
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <>
       {isVisible && (
         <button
           onClick={scrollToTop}
+          aria-label="scroll to top"
           className={`items-center justify-center w-10 h-10 rounded-[4px] shadow-lg bg-blue ease-out duration-200 hover:bg-blue-dark fixed bottom-8 right-8 z-999 ${
             isVisible ? "flex" : "hidden"
           }`}

@@ -40,7 +40,7 @@ const HeroCarousal = () => {
             </div>
 
             <h1 className="font-semibold text-dark text-xl sm:text-3xl mb-3">
-              <Link href="/shop/esp32">
+              <Link href="/shop-with-sidebar">
                 ESP32 NodeMCU (WiFi + Bluetooth)
               </Link>
             </h1>
@@ -91,7 +91,7 @@ const HeroCarousal = () => {
             </div>
 
             <h2 className="font-semibold text-dark text-xl sm:text-3xl mb-3">
-              <Link href="/shop/esp32">
+              <Link href="/shop-with-sidebar">
                 Dual-Core Power & Arduino Compatible
               </Link>
             </h2>
