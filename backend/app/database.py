@@ -42,7 +42,7 @@ class Database:
         """Create database indexes for performance"""
         try:
             # ---------------------------------------------------------
-            # 1. KITS Collection (No changes needed here)
+            # 1. KITS Collection
             # ---------------------------------------------------------
             await cls.db.kits.create_index("name")
             await cls.db.kits.create_index("category")
@@ -50,22 +50,28 @@ class Database:
             await cls.db.kits.create_index("is_active")
             
             # ---------------------------------------------------------
-            # 2. ORDERS Collection (UPDATED)
+            # 2. ORDERS Collection
             # ---------------------------------------------------------
-            
-            # OLD: await cls.db.orders.create_index("customer_email")
-            # NEW: Use dot notation to reach inside the 'customer' object
             await cls.db.orders.create_index("customer.email")
-            
-            # Status and Date are still at the root level, so these are fine
             await cls.db.orders.create_index("status")
             await cls.db.orders.create_index("created_at")
-            
-            # OLD: await cls.db.orders.create_index([("kit_id", 1), ("created_at", -1)])
-            # NEW: Index inside the 'items' array. MongoDB automatically creates 
-            # a "Multikey Index" here, allowing you to search for orders 
-            # containing a specific product ID.
             await cls.db.orders.create_index([("items.id", 1), ("created_at", -1)])
+
+            # ---------------------------------------------------------
+            # 3. REVIEWS Collection (NEW)
+            # ---------------------------------------------------------
+            # Fast lookups by product (to show reviews on product page)
+            await cls.db.reviews.create_index("product_id")
+            
+            # Fast sorting by date (for "Newest First")
+            await cls.db.reviews.create_index("created_at")
+            
+            # Filter valid reviews
+            await cls.db.reviews.create_index("is_visible")
+            
+            # OPTIMIZATION: Compound index for "Get latest reviews for this product"
+            # This makes that specific query instant.
+            await cls.db.reviews.create_index([("product_id", 1), ("created_at", -1)])
             
             logger.info("Database indexes created successfully")
         except Exception as e:

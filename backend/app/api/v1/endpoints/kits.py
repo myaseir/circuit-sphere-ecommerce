@@ -2,14 +2,16 @@ import json # ✅ Need this to parse specifications string
 import cloudinary
 import cloudinary.uploader
 from typing import List, Optional, Dict
-from fastapi import APIRouter, Depends, Query, HTTPException, status, UploadFile, File, Form, Body
+from fastapi import APIRouter, Depends, Query, HTTPException, status, UploadFile, File, Form, Body, Request
 
 from app.usecases.kit_usecase import KitUseCase
 from app.models.schemas import (
     KitUpdate, 
     KitResponse, 
     PaginatedResponse,
-    SaleToggleRequest # ✅ Import this schema
+    SaleToggleRequest, # ✅ Import this schema
+    ReviewCreate,      # ✅ NEW: For review submission
+    ReviewResponse     # ✅ NEW: For listing reviews
 )
 from app.api.dependencies import get_kit_usecase
 from app.core.exceptions import NotFoundException, ValidationException
@@ -130,6 +132,54 @@ async def toggle_sale(
         # You need to ensure your usecase has a toggle_sale method calling repository
         # If your usecase doesn't have it yet, add it to kit_usecase.py
         return await usecase.toggle_sale_status(kit_id, sale_data.on_sale)
+    except NotFoundException as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+# ---------------------------------------------------------
+# ✅ NEW: Review Endpoints (Added Here)
+# ---------------------------------------------------------
+
+@router.post("/{kit_id}/reviews", response_model=ReviewResponse)
+async def create_review(
+    kit_id: str,
+    review: ReviewCreate,
+    request: Request,
+    usecase: KitUseCase = Depends(get_kit_usecase)
+):
+    """
+    Submit a review for a specific Kit.
+    Includes rate limiting: 1 review per IP per 10 mins.
+    """
+    # 1. Prepare data
+    review_data = review.model_dump()
+    review_data["product_id"] = kit_id
+    
+    # 2. Get IP for spam check
+    client_ip = request.client.host
+    
+    try:
+        return await usecase.add_review(review_data, client_ip)
+    except Exception as e:
+        # Catch the rate limit error from UseCase
+        if "Rate limit" in str(e):
+            raise HTTPException(status_code=429, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e))
+
+# ✅ FIX: Updated to accept 'skip' for pagination
+@router.get("/{kit_id}/reviews", response_model=List[ReviewResponse])
+async def get_reviews(
+    kit_id: str,
+    skip: int = Query(0, ge=0),          # <--- Added 'skip'
+    limit: int = Query(6, ge=1, le=50),  # <--- Changed default to 6 to match frontend
+    usecase: KitUseCase = Depends(get_kit_usecase)
+):
+    """
+    Get the latest reviews for this kit.
+    Supports pagination via 'skip' and 'limit'.
+    """
+    try:
+        # Pass skip/limit to usecase
+        return await usecase.get_reviews_for_kit(kit_id, skip=skip, limit=limit)
     except NotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
 

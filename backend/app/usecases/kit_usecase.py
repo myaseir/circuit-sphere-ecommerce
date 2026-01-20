@@ -64,7 +64,11 @@ class KitUseCase:
                 "spec_images": kit_data.get("spec_images", []),
                 "image_url": kit_data.get("image_url", []),
                 # Auto-generate slug if not provided
-                "slug": kit_data.get("slug") or kit_data["name"].lower().replace(" ", "-")
+                "slug": kit_data.get("slug") or kit_data["name"].lower().replace(" ", "-"),
+                
+                # Default ratings for new product
+                "average_rating": 0.0,
+                "total_reviews": 0
             })
 
             created_doc = await self.kit_repository.create(kit_data)
@@ -88,8 +92,9 @@ class KitUseCase:
                 "created_at": now, 
                 "updated_at": now, 
                 "is_active": True,
-                # Create slug from name if missing
-                "slug": kit_dict.get("slug") or kit_dict["name"].lower().replace(" ", "-")
+                "slug": kit_dict.get("slug") or kit_dict["name"].lower().replace(" ", "-"),
+                "average_rating": 0.0,
+                "total_reviews": 0
             })
             
             created_doc = await self.kit_repository.create(kit_dict)
@@ -117,11 +122,36 @@ class KitUseCase:
         if not kit: raise NotFoundException("Kit not found")
         
         if kit.get("stock_quantity", 0) + quantity_change < 0:
-            # ✅ FIX: Added errors=[] to prevent crash
             raise ValidationException("Insufficient stock to perform this operation", errors=[])
             
         updated = await self.kit_repository.update_stock(kit_id, quantity_change)
         return self._format_kit_response(updated)
+
+    # ==========================================
+    # ✅ REVIEWS (NEW MERGED LOGIC)
+    # ==========================================
+    
+    async def add_review(self, review_data: Dict[str, Any], client_ip: str) -> Dict[str, Any]:
+        """
+        1. Check Rate Limit (Spam Protection)
+        2. Create Review via Repository
+        """
+        product_id = review_data.get("product_id")
+        
+        # 1. Spam Check
+        can_post = await self.kit_repository.check_review_rate_limit(client_ip, product_id)
+        if not can_post:
+            # Return specific error message for the API to catch
+            raise ValidationException("Rate limit exceeded: You can only review this product once every 10 minutes.", errors=[])
+
+        # 2. Save
+        return await self.kit_repository.add_review(review_data)
+
+    # ✅ UPDATED: Supports pagination (skip/limit)
+    async def get_reviews_for_kit(self, kit_id: str, skip: int = 0, limit: int = 5) -> List[Dict[str, Any]]:
+        """Get latest reviews for a specific kit with pagination"""
+        self._validate_object_id(kit_id)
+        return await self.kit_repository.get_reviews(kit_id, skip=skip, limit=limit)
 
     # ==========================================
     # ✅ GET, UPDATE, DELETE (CRUD)
@@ -132,15 +162,10 @@ class KitUseCase:
         if not kit: raise NotFoundException(f"Kit {kit_id} not found")
         return self._format_kit_response(kit)
 
-    # ✅ NEW: Added support for finding by Slug (e.g., /kits/esp32)
     async def get_kit_by_slug(self, slug: str) -> Dict[str, Any]:
-        # Search repository for this slug
-        # Note: You might need to add `find_one({"slug": slug})` to your repository if it doesn't exist
         kit = await self.kit_repository.find_one({"slug": slug})
-        
         if not kit:
             raise NotFoundException(f"Product '{slug}' not found")
-            
         return self._format_kit_response(kit)
 
     async def update_kit(self, kit_id: str, kit_data: KitUpdate) -> Dict[str, Any]:
@@ -170,18 +195,15 @@ class KitUseCase:
     # ==========================================
     def _validate_object_id(self, id_str: str):
         if not ObjectId.is_valid(id_str):
-            # ✅ FIX: Added errors=[] to prevent 500 Crash
             raise ValidationException(f"ID '{id_str}' is not a valid MongoDB ObjectId", errors=[])
 
     def _validate_raw_data(self, data: Dict):
-        # ✅ FIX: Added errors=[]
         if data.get("price", 0) <= 0: 
             raise ValidationException("Price must be > 0", errors=[])
         if not data.get("name"): 
             raise ValidationException("Product name is required", errors=[])
 
     def _validate_kit_schema(self, data: KitCreate):
-        # ✅ FIX: Added errors=[]
         if data.price <= 0: 
             raise ValidationException("Price must be positive", errors=[])
 
@@ -200,7 +222,11 @@ class KitUseCase:
         res["spec_images"] = res.get("spec_images", [])
         res["image_url"] = res.get("image_url", [])
         res["category"] = res.get("category", "General")
-        # Ensure slug exists in response
         res["slug"] = res.get("slug") or res.get("name", "").lower().replace(" ", "-")
+        
+        # --- NEW: Aggregates Defaults ---
+        # Ensures existing products without these fields don't break frontend
+        res["average_rating"] = res.get("average_rating", 0.0)
+        res["total_reviews"] = res.get("total_reviews", 0)
         
         return res

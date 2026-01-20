@@ -4,11 +4,36 @@ from pydantic import BaseModel, Field
 from .entities import Component, OrderStatus
 
 # --------------------------------------
+# REVIEW SCHEMAS (NEW)
+# --------------------------------------
+
+class ReviewBase(BaseModel):
+    reviewer_name: str = Field(..., min_length=1, description="Guest name")
+    rating: int = Field(..., ge=1, le=5, description="Star rating 1-5")
+    comment: str = Field(..., min_length=1, description="Review content")
+
+class ReviewCreate(ReviewBase):
+    # No extra fields needed. 
+    # 'product_id' will typically come from the URL endpoint.
+    pass
+
+class ReviewResponse(ReviewBase):
+    id: str  # Using str to match your existing ID pattern
+    product_id: str
+    created_at: datetime
+    
+    # Internal usage fields (optional to expose, but useful)
+    is_visible: bool = True
+
+    class Config:
+        from_attributes = True
+
+
+# --------------------------------------
 # KIT SCHEMAS
 # --------------------------------------
 
 # 1. Base Schema (Shared fields)
-# This prevents repeating code in Create and Response
 class KitBase(BaseModel):
     name: str
     description: Optional[str] = None
@@ -16,28 +41,26 @@ class KitBase(BaseModel):
     stock_quantity: int
     category: str
     
-    # Image can be a list of strings OR a single string (for backward compatibility)
+    # Image can be a list of strings OR a single string
     image_url: Optional[Union[List[str], str]] = []
     
-    # --- SALE & SPECS (Now in Base, so they cover everything) ---
+    # --- SALE & SPECS ---
     original_price: Optional[float] = None
     on_sale: bool = False
-    specifications: Dict[str, str] = {}  # e.g. {"Voltage": "5V"}
-    spec_images: List[str] = []          # e.g. ["url_to_diagram.png"]
+    specifications: Dict[str, str] = {} 
+    spec_images: List[str] = []         
     # ------------------------------------------------------------
     
     is_active: bool = True
     components: List[Component] = []
 
 
-# 2. Create Schema (Inherits from Base)
+# 2. Create Schema
 class KitCreate(KitBase):
-    pass 
-    # Logic: inherits everything from KitBase. 
-    # You can add fields specific to creation here if needed.
+    slug: Optional[str] = None  # Allow manual slug creation
 
 
-# 3. Update Schema (Everything Optional)
+# 3. Update Schema
 class KitUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
@@ -55,11 +78,20 @@ class KitUpdate(BaseModel):
     # ----------------------------
 
 
-# 4. Response Schema (Inherits Base + ID/Timestamps)
+# 4. Response Schema (UPDATED)
 class KitResponse(KitBase):
     id: str
     created_at: datetime
     updated_at: Optional[datetime] = None
+    
+    # ✅ Added Slug (Backend calculates it, frontend might need it)
+    slug: Optional[str] = None
+    
+    # --- NEW: REVIEW AGGREGATES ---
+    # ✅ FIX: These fields allow the rating to show on the card
+    average_rating: float = 0.0
+    total_reviews: int = 0
+    # ------------------------------
     
     class Config:
         from_attributes = True
