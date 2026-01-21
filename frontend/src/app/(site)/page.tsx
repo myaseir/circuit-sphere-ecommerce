@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
   // ✅ 4. Canonical URL: Points to your new domain
   alternates: {
-    canonical: "https://www.glacialabs.com",
+    canonical: "https://glacialabs.com",
   },
 
   // ✅ 5. Open Graph: For Facebook/WhatsApp sharing
