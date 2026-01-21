@@ -6,18 +6,14 @@ export default function HealthPage() {
   const [status, setStatus] = useState<'loading' | 'healthy' | 'error'>('loading');
   const [data, setData] = useState<any>(null);
 
-  // UPDATED: Now uses your env variable
-  // It falls back to localhost only if the variable is missing
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  // Use env variable with fallback
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        // Fetch from the API
         const res = await fetch(`${API_URL}/health`);
-        
         if (!res.ok) throw new Error('Failed');
-        
         const json = await res.json();
         setData(json);
         setStatus('healthy');
@@ -31,8 +27,10 @@ export default function HealthPage() {
   }, [API_URL]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 border border-gray-100">
+    // CHANGED: Removed 'items-center', added 'pt-32' (top padding) to clear the navbar
+    <div className="min-h-screen bg-gray-50 flex justify-center pt-32 px-4">
+      
+      <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 border border-gray-100 h-fit">
         
         {/* Header */}
         <div className="text-center mb-8">
@@ -96,7 +94,7 @@ export default function HealthPage() {
 
         {/* Error Details */}
         {status === 'error' && (
-           <div className="mt-4 p-3 bg-red-50 rounded text-xs text-red-600">
+           <div className="mt-4 p-3 bg-red-50 rounded text-xs text-red-600 break-all">
              Unable to connect to backend at: <br/> 
              <span className="font-mono">{API_URL}</span>
            </div>
