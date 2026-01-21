@@ -7,6 +7,8 @@ import logging
 from app.core.config import settings
 from app.core.exceptions import AppException
 from app.api.v1.api import api_router
+# --- NEW: Import the SEO endpoint ---
+from app.api.v1.endpoints import seo as seo_routes 
 from app.database import connect_to_mongo, close_mongo_connection
 from app.core.logger import setup_logging
 
@@ -36,7 +38,6 @@ app = FastAPI(
 )
 
 # CORS middleware
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -63,6 +64,12 @@ async def app_exception_handler(request: Request, exc: AppException):
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
+# --- NEW: Include the SEO Router ---
+# This exposes /api/feed.xml outside of your normal API versioning if you prefer,
+# or you can change prefix to match your API structure.
+app.include_router(seo_routes.router, prefix="/api", tags=["SEO"])
+
+
 # Health check endpoint
 @app.get("/health", tags=["health"])
 async def health_check():
@@ -80,5 +87,6 @@ async def root():
     return {
         "message": f"Welcome to {settings.APP_NAME}",
         "docs": "/docs",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "feed_url": "/api/feed.xml"  # Helpful for quick access
     }
