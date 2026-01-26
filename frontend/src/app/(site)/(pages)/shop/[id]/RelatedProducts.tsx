@@ -15,28 +15,36 @@ const RelatedProducts = ({ currentProductId, category }: Props) => {
   useEffect(() => {
     const fetchRelated = async () => {
       try {
-        // 1. Fetch all kits (or use a specific category endpoint if your API supports it)
-      // This picks up the Render URL from Vercel or falls back to local for development
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        const res = await fetch(`${baseUrl}/api/v1/kits`);
+        const data = await res.json();
 
-const res = await fetch(`${baseUrl}/api/v1/kits`);
-const data = await res.json();
+        // ✅ HELPER: Cache Busting (Same as ProductClient)
+        // This ensures the related products don't show old/stale images
+        const timestamp = Date.now();
+        const addVersion = (url: string) => 
+          url.includes("cloudinary.com") ? `${url}?v=${timestamp}` : url;
 
-        // 2. FILTER LOGIC:
-        // - Must match the Category
-        // - Must NOT be the current product (don't show what I'm already looking at)
         const related = data
           .filter((item: any) => 
-            item.category === category && item.id !== currentProductId
+            // Strict String Comparison
+            item.category === category && String(item.id) !== currentProductId
           )
-          .map((item: any) => ({
-            id: item.id,
-            title: item.name,
-            price: item.price,
-            image: Array.isArray(item.image_url) ? item.image_url : [item.image_url],
-            category: item.category,
-          }))
-          .slice(0, 4); // Limit to 4 items
+          .map((item: any) => {
+             // Handle Image Array & Cache Busting
+             const rawImages = item.image_url 
+              ? (Array.isArray(item.image_url) ? item.image_url : [item.image_url]) 
+              : ["/images/product/product-01.png"];
+             
+             return {
+              id: String(item.id),
+              title: item.name,
+              price: item.price,
+              image: rawImages.map(addVersion), // ✅ Apply the fix here
+              category: item.category,
+            };
+          })
+          .slice(0, 4);
 
         setProducts(related);
       } catch (error) {
@@ -49,7 +57,7 @@ const data = await res.json();
     }
   }, [category, currentProductId]);
 
-  if (products.length === 0) return null; // Don't show section if no related items found
+  if (products.length === 0) return null;
 
   return (
     <section className="py-10 bg-gray-50 border-t border-gray-200">
@@ -69,6 +77,7 @@ const data = await res.json();
                   alt={product.title}
                   fill
                   className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                 />
               </div>
               <div>

@@ -87,7 +87,7 @@ const ShopContent = () => {
       params.delete("category");
     }
     setProductSidebar(false);
-    router.push(`/shop-with-sidebar?${params.toString()}`, { scroll: false });
+    router.push(`/shop?${params.toString()}`, { scroll: false });
   };
 
   return (

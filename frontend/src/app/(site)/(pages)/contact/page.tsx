@@ -11,14 +11,14 @@ export const metadata: Metadata = {
 
   // ✅ SEO: Canonical URL
   alternates: {
-    canonical: "https://www.glacialabs.com/contact",
+    canonical: "https://glacialabs.com/contact",
   },
 
   // ✅ Social Sharing
   openGraph: {
     title: "Contact Glacia Labs Support",
     description: "Need help with your electronics project? Contact our support team.",
-    url: "https://www.glacialabs.com/contact",
+    url: "https://glacialabs.com/contact",
     siteName: "Glacia Labs",
     type: "website",
   },

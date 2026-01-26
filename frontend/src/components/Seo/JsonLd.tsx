@@ -1,33 +1,38 @@
 import React from "react";
 
 const JsonLd = ({ product }: { product: any }) => {
+  // 1. Safe Image Handling (Google hates missing images)
+  const images = product.image_url 
+    ? (Array.isArray(product.image_url) ? product.image_url : [product.image_url])
+    : ["https://glacialabs.com/images/logo/logo.png"]; // Fallback to logo
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    image: Array.isArray(product.image_url) ? product.image_url : [product.image_url],
+    image: images,
     description: product.description,
-    sku: product.id,
+    sku: String(product.id),
+    mpn: String(product.id), // ✅ Google recommends MPN (Manufacturer Part Number)
     brand: {
       "@type": "Brand",
       name: "Glacia Labs",
     },
     offers: {
       "@type": "Offer",
-      url: `https://www.glacialabs.com/shop/${product.id}`,
+      url: `https://glacialabs.com/shop/${product.id}`,
       priceCurrency: "PKR",
       price: product.price,
-      priceValidUntil: "2026-12-31",
+      priceValidUntil: "2027-12-31", // Extended the valid date
       availability: product.stock_quantity > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       itemCondition: "https://schema.org/NewCondition",
       shippingDetails: {
         "@type": "OfferShippingDetails",
         "shippingRate": {
           "@type": "MonetaryAmount",
-          "value": 0, // Free Shipping
+          "value": 0, // 0 means Free Shipping
           "currency": "PKR"
         },
-        // ✅ NEW: Restrict shipping region to Pakistan only
         "shippingDestination": {
           "@type": "DefinedRegion",
           "addressCountry": "PK" 
@@ -49,11 +54,12 @@ const JsonLd = ({ product }: { product: any }) => {
         }
       }
     },
-    ...(product.average_rating > 0 && {
+    // ✅ RATINGS LOGIC: Ensures formatting is safe (e.g. "4.5")
+    ...(product.average_rating && Number(product.average_rating) > 0 && {
       aggregateRating: {
         "@type": "AggregateRating",
-        ratingValue: product.average_rating,
-        reviewCount: product.total_reviews || 1,
+        ratingValue: Number(product.average_rating).toFixed(1),
+        reviewCount: Number(product.total_reviews) || 1, // Fallback to 1 if count is missing but rating exists
         bestRating: "5",
         worstRating: "1"
       }

@@ -1,38 +1,60 @@
-import { Category } from "@/types/category";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const convertToSlug = (text: string) => {
-  return text.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+type CategoryItem = {
+  id: number;
+  title: string;
+  image: string;
+  path: string;
+  productCount?: number;
 };
 
-const SingleItem = ({ item }: { item: Category }) => {
+const SingleItem = ({ item }: { item: CategoryItem }) => {
   return (
     <Link 
-      href={`/shop-with-sidebar?category=${convertToSlug(item.title)}`} 
-      className="group flex flex-col items-center"
+      href={item.path || "#"} 
+      className="group flex flex-col items-center w-full"
     >
-      <div className="relative max-w-[130px] w-full h-32.5 rounded-full overflow-hidden flex items-center justify-center mb-4 border border-gray-100 shadow-sm bg-white">
+      {/* 1. CONTAINER: 
+         - Changed rounded-[20px] to rounded-full (Circle) 
+         - Removed 'p-4' or inner padding constraints so image touches edges
+      */}
+      <div className="
+        relative w-full aspect-square 
+        flex items-center justify-center 
+        bg-gray-100 
+        rounded-full 
+        border border-gray-200
+        shadow-sm 
+        overflow-hidden
+        transition-all duration-300 
+        group-hover:shadow-md group-hover:border-blue-500 group-hover:-translate-y-1
+        mb-4
+      ">
+        
+        {/* 2. IMAGE:
+           - Removed the wrapping div (w-2/3) so it fills 100%
+           - Changed 'object-contain' to 'object-cover' (Crucial for filling)
+        */}
         <Image 
-          src={item.img} 
+          src={item.image} 
           alt={item.title} 
           fill 
-          // ✅ FIX 1: Tell browser this image is never wider than 130px
-          sizes="(max-width: 768px) 100px, 130px" 
-          
+          sizes="(max-width: 768px) 150px, 200px"
           className="object-cover object-center transition-transform duration-500 group-hover:scale-110"
-          
-          // ✅ FIX 2: Removed 'priority'. 
-          // Only add 'loading="eager"' if this component is literally at the very top of your homepage.
           loading="lazy" 
         />
       </div>
 
-      <div className="flex justify-center px-2">
-        <h3 className="text-sm font-medium text-center text-dark leading-tight transition-colors duration-300 group-hover:text-blue lg:text-base">
+      {/* TITLE & COUNT */}
+      <div className="flex flex-col items-center px-2">
+        <h3 className="text-sm font-semibold text-center text-dark leading-tight transition-colors duration-300 group-hover:text-blue lg:text-base">
           {item.title}
         </h3>
+        {item.productCount && (
+          <span className="text-xs text-gray-500 mt-1">{item.productCount} Products</span>
+        )}
       </div>
     </Link>
   );
