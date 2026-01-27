@@ -4,9 +4,13 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "**", // 👈 This allows images from ANY website
+        hostname: "**", 
       },
     ],
+  },
+  // ✅ FIX: Enable CSS inlining to eliminate render-blocking requests
+  experimental: {
+    inlineCss: true,
   },
 };
 

@@ -22,9 +22,10 @@ const HeroCarousal = () => {
         clickable: true,
       }}
       modules={[Autoplay, Pagination]}
-      className="hero-carousel"
+      // ✅ Tailwind arbitrary variants keep style.css small and reduce render-blocking CSS
+      className="hero-carousel [&_.swiper-pagination-bullet]:h-1 [&_.swiper-pagination-bullet]:w-4 [&_.swiper-pagination-bullet]:rounded-[11px] [&_.swiper-pagination-bullet]:bg-gray-4 [&_.swiper-pagination-bullet-active]:w-5.5 [&_.swiper-pagination-bullet-active]:bg-blue xl:[&_.swiper-pagination]:!bottom-5"
     >
-      {/* ================= SLIDE 1 ================= */}
+      {/* ================= SLIDE 1 (LCP Target) ================= */}
       <SwiperSlide>
         <div className="flex items-center pt-6 sm:pt-0 flex-col-reverse sm:flex-row">
           <div className="max-w-[394px] py-10 sm:py-15 lg:py-24.5 pl-4 sm:pl-7.5 lg:pl-12.5">
@@ -52,7 +53,7 @@ const HeroCarousal = () => {
 
             <Link
               href="/shop"
-              className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10"
+              className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10 transition-colors"
             >
               Shop Now
             </Link>
@@ -64,18 +65,19 @@ const HeroCarousal = () => {
               alt="ESP32 NodeMCU WiFi Bluetooth Board Pakistan"
               width={351}
               height={358}
-              priority={true} // ✅ CORRECT: Loads instantly for LCP
-              
-              // ✅ ADDED: Tells browser "on mobile use small img, on desktop use ~351px"
-              sizes="(max-width: 640px) 90vw, 351px" 
-              
+              // ✅ CRITICAL FIXES FOR LCP:
+              priority={true}             // Removes 'loading=lazy' and preloads the image
+              fetchPriority="high"        // Instructs browser to prioritize this over other resources
+              loading="eager"             // Forces immediate loading
+              decoding="sync"            // Reduces delay between download and display
+              sizes="(max-width: 640px) 100vw, 351px" 
               className="object-contain"
             />
           </div>
         </div>
       </SwiperSlide>
 
-      {/* ================= SLIDE 2 ================= */}
+      {/* ================= SLIDE 2 (Lazy Loaded) ================= */}
       <SwiperSlide>
         <div className="flex items-center pt-6 sm:pt-0 flex-col-reverse sm:flex-row">
           <div className="max-w-[394px] py-10 sm:py-15 lg:py-26 pl-4 sm:pl-7.5 lg:pl-12.5">
@@ -101,10 +103,9 @@ const HeroCarousal = () => {
               Fully compatible with Arduino IDE, MicroPython, and Lua.
             </p>
 
-            {/* ✅ FIXED: Changed external render link to internal relative link */}
             <Link
               href="/shop/696a3adf2a70bea3e9ec3076" 
-              className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10"
+              className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10 transition-colors"
             >
               Buy Now
             </Link>
@@ -116,11 +117,9 @@ const HeroCarousal = () => {
               alt="ESP32 Development Board Pinout and Features"
               width={361}
               height={368}
-              // ❌ priority removed (Correct: Slide 2 should lazy load)
-              
-              // ✅ ADDED: Consistent sizing
-              sizes="(max-width: 640px) 90vw, 361px"
-              
+              // ✅ OPTIMIZED: No priority here so it doesn't fight with Slide 1 for bandwidth
+              loading="lazy"
+              sizes="(max-width: 640px) 100vw, 361px"
               className="object-contain"
             />
           </div>

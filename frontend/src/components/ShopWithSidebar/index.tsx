@@ -3,11 +3,9 @@ import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Breadcrumb from "../Common/Breadcrumb";
 import SingleGridItem from "../Shop/SingleGridItem";
-// ✅ IMPORT LIST ITEM (Ensure this file exists in your folder structure)
 import SingleListItem from "@/components/Shop/SingleListItem"; 
 import { Product } from "@/types/product";
 
-// --- HELPERS ---
 const convertToSlug = (text: string) => {
   return text.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 };
@@ -25,7 +23,6 @@ const categories = [
   { name: "Prototyping Tools & Consumables" },
 ];
 
-// --- INNER COMPONENT (Contains Logic) ---
 const ShopContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -40,19 +37,41 @@ const ShopContent = () => {
     try {
       setIsLoading(true);
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      
+      // 1. Get Params
       const categorySlug = searchParams.get("category") || "";
+      const searchQuery = searchParams.get("search") || "";
+      
       const found = categories.find(cat => convertToSlug(cat.name) === categorySlug);
       const activeName = found ? found.name : "";
-      
       setSelectedCategoryName(activeName);
 
-      let url = `${baseUrl}/api/v1/kits?skip=0&limit=100`; 
-      if (activeName) url += `&category=${encodeURIComponent(activeName)}`;
+      // 2. Build URL
+      const apiParams = new URLSearchParams();
+      apiParams.append("skip", "0");
+      apiParams.append("limit", "100"); // Ensure we get enough items to filter
+      if (activeName) apiParams.append("category", activeName);
+      if (searchQuery) apiParams.append("search", searchQuery);
+
+      const url = `${baseUrl}/api/v1/kits?${apiParams.toString()}`;
+      
+      console.log("Fetching:", url); // Debug
 
       const response = await fetch(url);
       if (!response.ok) throw new Error("API Error");
-      const apiData = await response.json();
       
+      let apiData = await response.json();
+
+      // ✅ THE FIX: Manual Client-Side Filtering
+      // If the API returned results but didn't filter them, we do it here.
+      if (searchQuery) {
+        const lowerQuery = searchQuery.toLowerCase();
+        apiData = apiData.filter((item: any) => 
+          item.name.toLowerCase().includes(lowerQuery)
+        );
+      }
+
+      // Map to your frontend structure
       setProducts(apiData.map((item: any) => ({
         id: item.id,
         title: item.name,
@@ -63,11 +82,10 @@ const ShopContent = () => {
         stock: item.stock_quantity,
         originalPrice: item.original_price,
         isOnSale: item.on_sale,
-        
-        // ✅ CRITICAL FIX: Map the Rating Data from API
         rating: item.average_rating || 0,
         reviews: item.total_reviews || 0,
       })));
+
     } catch (error) {
       console.error("Fetch failed:", error);
     } finally {
@@ -90,17 +108,18 @@ const ShopContent = () => {
     router.push(`/shop?${params.toString()}`, { scroll: false });
   };
 
+  const currentSearch = searchParams.get("search");
+
   return (
     <>
       <Breadcrumb
-        title={selectedCategoryName ? selectedCategoryName : "All Electronics"}
+        title={currentSearch ? `Search: "${currentSearch}"` : (selectedCategoryName || "All Electronics")}
         pages={["shop", "/", "Results"]}
       />
 
       <section className="relative pb-20 pt-6 bg-[#f9fafb]">
         <div className="max-w-[1170px] mx-auto px-4 lg:px-8">
-          
-          {/* MOBILE OVERLAY */}
+          {/* Mobile Overlay */}
           <div 
             className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] xl:hidden transition-all duration-300 ${
               productSidebar ? "opacity-100 visible" : "opacity-0 invisible"
@@ -109,51 +128,37 @@ const ShopContent = () => {
           />
 
           <div className="flex flex-col xl:flex-row gap-6">
-            
-            {/* SIDEBAR */}
+            {/* Sidebar */}
             <aside className={`fixed top-0 left-0 h-full w-[85%] max-w-[340px] bg-white z-[10001] shadow-2xl transition-transform duration-500 ease-in-out xl:static xl:translate-x-0 xl:z-1 xl:w-[240px] xl:bg-transparent xl:shadow-none ${
               productSidebar ? "translate-x-0" : "-translate-x-full"
             }`}>
-              <div className="flex flex-col h-full">
-                <div className="p-6 border-b border-gray-100 xl:hidden flex items-center justify-between bg-white">
-                  <div>
-                    <h3 className="text-xl font-bold text-dark">Categories</h3>
-                  </div>
-                  <button onClick={() => setProductSidebar(false)} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-dark">✕</button>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-6 xl:p-0">
-                  <div className="flex flex-col gap-1.5">
-                    <h4 className="hidden xl:block font-bold text-dark mb-4 text-base">Categories</h4>
+              <div className="flex flex-col h-full p-6 xl:p-0">
+                <h4 className="font-bold text-dark mb-4 text-base">Categories</h4>
+                <div className="flex flex-col gap-1.5">
+                  <button
+                    onClick={() => handleCategoryChange("")}
+                    className={`w-full text-left px-3 py-2.5 rounded-lg transition-all text-sm font-medium ${
+                      selectedCategoryName === "" ? "bg-blue text-white" : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    All Products
+                  </button>
+                  {categories.map((cat) => (
                     <button
-                      onClick={() => handleCategoryChange("")}
-                      className={`w-full text-left px-3 py-2.5 rounded-lg transition-all text-sm font-medium ${
-                        selectedCategoryName === "" 
-                        ? "bg-blue text-white shadow-md shadow-blue/20" 
-                        : "text-gray-600 hover:bg-gray-100"
+                      key={cat.name}
+                      onClick={() => handleCategoryChange(cat.name)}
+                      className={`w-full text-left px-3 py-2.5 rounded-lg transition-all text-xs font-medium leading-tight ${
+                        selectedCategoryName === cat.name ? "bg-blue text-white" : "text-gray-600 hover:bg-gray-100"
                       }`}
                     >
-                      All Products
+                      {cat.name}
                     </button>
-                    {categories.map((cat) => (
-                      <button
-                        key={cat.name}
-                        onClick={() => handleCategoryChange(cat.name)}
-                        className={`w-full text-left px-3 py-2.5 rounded-lg transition-all text-xs font-medium leading-tight ${
-                          selectedCategoryName === cat.name 
-                          ? "bg-blue text-white shadow-md shadow-blue/20" 
-                          : "text-gray-600 hover:bg-gray-100"
-                        }`}
-                      >
-                        {cat.name}
-                      </button>
-                    ))}
-                  </div>
+                  ))}
                 </div>
               </div>
             </aside>
 
-            {/* MAIN CONTENT */}
+            {/* Main Content */}
             <div className="flex-1">
               <div className="bg-white rounded-2xl p-4 mb-8 flex items-center justify-between shadow-sm border border-gray-100">
                 <button 
@@ -185,17 +190,18 @@ const ShopContent = () => {
               ) : (
                 <div className={productStyle === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "flex flex-col gap-6"}>
                   {products.length > 0 ? (
-                    products.map((item, i) => (
-                      // ✅ CONDITIONAL RENDERING: GRID vs LIST
-                      productStyle === "grid" ? (
-                         <SingleGridItem key={item.id || i} item={item} />
-                      ) : (
-                         <SingleListItem key={item.id || i} item={item} />
-                      )
+                    products.map((item) => (
+                      productStyle === "grid" ? <SingleGridItem key={item.id} item={item} /> : <SingleListItem key={item.id} item={item} />
                     ))
                   ) : (
                     <div className="col-span-full py-20 text-center bg-white rounded-2xl border-2 border-dashed border-gray-100">
-                      <p className="text-gray-400">No components found.</p>
+                      <p className="text-gray-400">No components found for "{currentSearch}".</p>
+                      <button 
+                         onClick={() => router.push('/shop')}
+                         className="mt-4 text-blue font-bold hover:underline"
+                      >
+                         Clear Filters
+                      </button>
                     </div>
                   )}
                 </div>
@@ -208,14 +214,9 @@ const ShopContent = () => {
   );
 };
 
-// --- MAIN PAGE COMPONENT (Exports the Suspense Boundary) ---
 const ShopWithSidebar = () => {
   return (
-    <Suspense fallback={
-       <div className="flex justify-center items-center h-screen">
-          <div className="w-10 h-10 border-4 border-blue border-t-transparent rounded-full animate-spin"></div>
-       </div>
-    }>
+    <Suspense fallback={<div className="flex justify-center items-center h-screen"><div className="w-10 h-10 border-4 border-blue border-t-transparent rounded-full animate-spin"></div></div>}>
       <ShopContent />
     </Suspense>
   );

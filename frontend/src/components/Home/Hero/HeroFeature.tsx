@@ -12,7 +12,7 @@ const featureData: Feature[] = [
   {
     img: "/images/icons/icon-01.svg",
     title: "Free Shipping",
-    description: "For all orders over $200", // Clarified text slightly
+    description: "For all orders over PKR 500", // Clarified text slightly
   },
   {
     img: "/images/icons/icon-02.svg",
