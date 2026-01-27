@@ -40,7 +40,7 @@ const HeroCarousal = () => {
             </div>
 
             <h1 className="font-semibold text-dark text-xl sm:text-3xl mb-3">
-              <Link href="/shop-with-sidebar">
+              <Link href="/shop">
                 ESP32 NodeMCU (WiFi + Bluetooth)
               </Link>
             </h1>
@@ -103,7 +103,7 @@ const HeroCarousal = () => {
 
             {/* ✅ FIXED: Changed external render link to internal relative link */}
             <Link
-              href="/shop/69599364f412c4afb08b8632" 
+              href="/shop/696a3adf2a70bea3e9ec3076" 
               className="inline-flex font-medium text-white text-custom-sm rounded-md bg-dark py-3 px-9 ease-out duration-200 hover:bg-blue mt-10"
             >
               Buy Now

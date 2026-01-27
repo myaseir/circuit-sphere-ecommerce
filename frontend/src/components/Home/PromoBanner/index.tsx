@@ -25,7 +25,7 @@ const PromoBanner = () => {
             </p>
 
             <Link
-              href="/shop/kits/water-tank-automation"
+              href="/shop"
               className="inline-flex font-medium text-custom-sm text-white bg-blue py-3 px-9 rounded-md ease-out duration-200 hover:bg-dark mt-6 lg:mt-7.5"
             >
               Order Kit Now
@@ -49,39 +49,35 @@ const PromoBanner = () => {
         <div className="grid gap-7.5 grid-cols-1 lg:grid-cols-2">
           
           {/* ================= SMALL BANNER 1 (Arduino) ================= */}
+         {/* ================= SMALL BANNER 1 (Arduino) ================= */}
           <div className="relative z-1 overflow-hidden rounded-lg bg-[#E0F7FA] py-10 lg:py-16 px-6 lg:px-10 flex flex-col lg:flex-row items-center">
             
-            {/* Text Content */}
             <div className="w-full lg:text-right lg:ml-auto lg:max-w-[240px] text-center z-10">
               <span className="block text-base lg:text-lg text-dark mb-1.5">
                 For Beginners
               </span>
-
               <h2 className="font-bold text-xl lg:text-heading-4 text-dark mb-2.5">
                 Start Robotics
               </h2>
-
-              <p className="font-semibold text-custom-1 text-teal-700">
+              <p className="font-semibold text-teal-800 mb-6">
                 Arduino Uno R3 <br/> Flat 20% off
               </p>
 
               <Link
-                href="/shop/arduino"
-                // ✅ FIXED: Changed text color to white for better contrast
-                className="inline-flex font-medium text-custom-sm text-white bg-teal-600 py-2.5 px-8.5 rounded-md ease-out duration-200 hover:bg-teal-800 mt-6 lg:mt-9"
+                href="/shop/696a32182a70bea3e9ec3071"
+                // ✅ FIX: Used Hex Code [#059669] to force Green color
+                className="inline-flex font-bold text-sm !text-white !bg-[#059669] py-3 px-8 rounded-full shadow-md hover:!bg-[#047857] hover:shadow-lg transition-all duration-300"
               >
                 Grab Now
               </Link>
             </div>
 
-            {/* Image */}
             <div className="relative mt-8 lg:mt-0 lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:left-3 xl:left-6 lg:z-[-1]">
                <Image
                   src="https://res.cloudinary.com/dxxqrjnje/image/upload/v1768489890/electronic_kits/hb8rk8hifj33h1gseray.png"
                   alt="Arduino Uno R3"
                   width={180}
                   height={180}
-                  // ✅ ADDED SIZES
                   sizes="(max-width: 768px) 100vw, 180px"
                   className="object-contain hover:rotate-3 transition-transform duration-500 w-[140px] lg:w-[180px] mx-auto"
                />
@@ -94,23 +90,20 @@ const PromoBanner = () => {
               <span className="block text-base lg:text-lg text-dark mb-1.5">
                 IoT & WiFi
               </span>
-
               <h2 className="font-bold text-xl lg:text-heading-4 text-dark mb-2.5">
                 ESP32 NodeMCU
               </h2>
-
-              <p className="text-custom-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-700 mb-4 font-medium">
                   Dual-core power for your next FYP.
               </p>
-              
               <span className="block font-bold text-orange-600 text-lg mb-6">
                 Save 15% Today
               </span>
 
-              {/* ✅ FIXED: Changed external Render URL to internal relative path */}
               <Link
-                href="/shop/69599364f412c4afb08b8632"
-                className="inline-flex font-medium text-custom-sm text-white bg-orange-500 py-2.5 px-8.5 rounded-md ease-out duration-200 hover:bg-orange-600"
+                href="/shop/696a3adf2a70bea3e9ec3076"
+                // ✅ FIX: Used Hex Code [#059669] to force Green color
+                className="inline-flex font-bold text-sm !text-white !bg-[#059669] py-3 px-8 rounded-full shadow-md hover:!bg-[#047857] hover:shadow-lg transition-all duration-300"
               >
                 Buy Now
               </Link>
@@ -122,7 +115,6 @@ const PromoBanner = () => {
                   alt="ESP32 NodeMCU"
                   width={160}
                   height={160}
-                  // ✅ ADDED SIZES
                   sizes="(max-width: 768px) 100vw, 160px"
                   className="object-contain hover:scale-110 transition-transform duration-500 w-[140px] lg:w-[160px]"
                />

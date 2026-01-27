@@ -82,7 +82,7 @@ const CountDown = () => {
 
             {/* ✅ LINK FIXED: Relative path for production safety */}
             <Link
-              href="/shop-details/69599364f412c4afb08b8632" 
+              href="/shop" 
               className="inline-flex font-medium text-custom-sm text-white bg-blue py-3 px-9.5 rounded-md ease-out duration-200 hover:bg-dark mt-7.5"
             >
               Shop Now

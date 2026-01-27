@@ -76,7 +76,7 @@ const Hero = () => {
                 <div className="flex items-center gap-14">
                   <div>
                     <h2 className="max-w-[153px] font-semibold text-dark text-xl mb-20">
-                      <Link href="shop-with-sidebar" className="hover:text-blue transition-colors">
+                      <Link href="/shop/696f851e00d61952b7a5efd8" className="hover:text-blue transition-colors">
                         SG90 Servo
                       </Link>
                     </h2>
@@ -87,10 +87,10 @@ const Hero = () => {
                       </p>
                       <span className="flex items-center gap-3">
                         <span className="font-medium text-heading-6 text-blue">
-                          PKR 350
+                          PKR 299
                         </span>
                         <span className="font-medium text-s text-dark-4 line-through">
-                          PKR 500
+                          PKR 399
                         </span>
                       </span>
                     </div>

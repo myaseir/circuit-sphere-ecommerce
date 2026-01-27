@@ -44,7 +44,7 @@ export const metadata = {
 
 const CategoriesPage = () => {
   return (
-    <section className="pt-24 pb-20 bg-gray-50">
+    <section className="pt-24 mt-24 pb-20 bg-gray-50">
       <div className="max-w-[1170px] mx-auto px-4 sm:px-8 xl:px-0">
         
         {/* Header Section */}
