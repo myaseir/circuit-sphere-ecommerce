@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation"; 
 import CustomSelect from "./CustomSelect";
 import Dropdown from "./Dropdown";
+import { useRouter, usePathname } from "next/navigation"; // 👈 Add usePathname here
 import { useAppSelector } from "@/redux/store";
 import { useSelector } from "react-redux";
 import { selectTotalPrice } from "@/redux/features/cart-slice";
@@ -66,6 +66,13 @@ const Header = () => {
   const product = useAppSelector((state) => state.cartReducer.items);
   const totalPrice = useSelector(selectTotalPrice);
   const router = useRouter(); 
+ 
+  const pathUrl = usePathname(); // 👈 Get the current URL
+
+  // ✅ Add this useEffect to close the menu when the URL changes
+  useEffect(() => {
+    setNavigationOpen(false);
+  }, [pathUrl]);
 
   const handleOpenCartModal = () => {
     openCartModal();

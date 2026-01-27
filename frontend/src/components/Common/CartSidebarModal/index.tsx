@@ -98,22 +98,23 @@ const CartSidebarModal = () => {
               <p className="font-medium text-xl text-dark">PKR {totalPrice}</p>
             </div>
 
-            <div className="flex items-center gap-4">
-              <Link
-                onClick={() => closeCartModal()}
-                href="/cart"
-                className="w-full flex justify-center font-medium text-white bg-blue py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-blue-dark"
-              >
-                View Cart
-              </Link>
+           <div className="flex items-center gap-4">
+  <Link
+    onClick={() => closeCartModal()} // Already here ✅
+    href="/cart"
+    className="w-full flex justify-center font-medium text-white bg-blue py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-blue-dark"
+  >
+    View Cart
+  </Link>
 
-              <Link
-                href="/checkout"
-                className="w-full flex justify-center font-medium text-white bg-dark py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-opacity-95"
-              >
-                Checkout
-              </Link>
-            </div>
+  <Link
+    onClick={() => closeCartModal()} // ✅ ADD THIS LINE
+    href="/checkout"
+    className="w-full flex justify-center font-medium text-white bg-dark py-[13px] px-6 rounded-md ease-out duration-200 hover:bg-opacity-95"
+  >
+    Checkout
+  </Link>
+</div>
           </div>
         </div>
       </div>
